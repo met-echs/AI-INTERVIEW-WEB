@@ -1,0 +1,69 @@
+<!-- evaluation_criteria_manage.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Evaluation Criteria</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>Manage Evaluation Criteria</h2>
+
+    <!-- Display messages (success or error) -->
+    {% if messages %}
+        <div class="alert alert-dismissible fade show" role="alert">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Form to add new Evaluation Criteria -->
+    <h4>Add New Evaluation Criteria</h4>
+    <form method="POST" action="{% url 'manage_evaluation_criteria' %}">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- This will render all fields, including the Job Role as a text field -->
+        <button type="submit" name="add_criteria" class="btn btn-primary">Add Criteria</button>
+    </form>
+
+    <hr>
+
+    <!-- Table to display existing Evaluation Criteria -->
+    <h4>Existing Evaluation Criteria</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Job Role</th>
+                <th>Experience (years)</th>
+                <th>Projects</th>
+                <th>Certifications</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for criteria in evaluation_criteria %}
+                <tr>
+                    <td>{{ criteria.job_role }}</td>
+                    <td>{{ criteria.min_years_experience }}</td>
+                    <td>{{ criteria.min_projects }}</td>
+                    <td>{{ criteria.certifications_required }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Button to delete all Evaluation Criteria -->
+    <form method="POST" action="{% url 'manage_evaluation_criteria' %}">
+        {% csrf_token %}
+        <button type="submit" name="delete_all" class="btn btn-danger">Delete All Entries</button>
+    </form>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

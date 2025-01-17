@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import PyPDF2
 
+# from dashboard.models import EvaluationCriteria, JobRole
 def upload_resume(request):
     if request.method == "POST":
         name = request.POST.get('name')
