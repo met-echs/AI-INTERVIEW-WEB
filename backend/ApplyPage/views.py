@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 import PyPDF2
+from dashboard.models import EvaluationCriteria
+from groq import Groq
 
-# from dashboard.models import EvaluationCriteria, JobRole
+client = Groq(api_key="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")
+
 def upload_resume(request):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -21,17 +24,58 @@ def upload_resume(request):
                 
                 # Clean up the extracted text (optional)
                 file_content = file_content.strip()
-
-                # For now, print the data to the console
-                # print(f"Name: {name}")
-                # print(f"Email: {email}")
-                # print(f"File Content:\n{file_content}")
                 
+                # Fetch the first evaluation criteria
+                resume_criteria = EvaluationCriteria.objects.first()
+
+                # Extract relevant fields from the evaluation criteria
+                job_role = resume_criteria.job_role
+                min_years_experience = resume_criteria.min_years_experience
+                min_projects = resume_criteria.min_projects
+                certifications_required = resume_criteria.certifications_required
+                print(f"Name:{name}")
+                print(f"Job Role: {job_role}")
+                # print(f"Minimum Years Experience: {min_years_experience}")
+                # print(f"Minimum Projects: {min_projects}")
+                # print(f"Certifications Required: {certifications_required}")
+                print
+                # Define the resume text extracted from the file
+                resume_text = file_content
+
+                # Define the evaluation prompt
+                prompt = f"""
+                You are tasked with evaluating a resume based on the following criteria:
+
+1. **Job Role**: Does the resume clearly specify a relevant job role for the position? The expected job role is: {job_role}.
+2. **Work Experience**: Does the resume list at least {min_years_experience} years of relevant work experience and if the experence is realted to the job role :{job_role} give extra 5 points?
+3. **Number of Projects**: Does the resume list at least {min_projects} relevant projects related to the job role:{job_role}?
+4. **Certifications**: Does the resume include relevant certifications? The expected certifications are: {certifications_required if certifications_required else "None"}.
+5. **ATS Friendliness**: Is the resume formatted in a way that would be readable by an Applicant Tracking System (ATS)?
+
+- Each of the four criteria (job role, work experience, number of projects, and certifications) will be rated from 0 to 25, and their total score will contribute to a final score out of 100.
+- If any of the criteria are missing or poorly satisfied, reduce the score below 50.
+- If the job role criteria is not satisfied, set the overall score to 40.
+- If the resume is **not ATS-friendly**, set the score to **-1**.
+
+Return only the final score as a **number** between -1 and 100, without any explanation or breakdown.
+                """
+
+                # Request completion from the model
+                completion = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",  # Use the best model for this task
+                    messages=[{"role": "user", "content": prompt + resume_text}],
+                    temperature=0.5,  # Use a lower temperature for consistent evaluation
+                    max_completion_tokens=2024,
+                    top_p=1,
+                    stream=False,  # Set to False since we only need the final score
+                )
+                score = float(completion.choices[0].message.content.strip())
+                print(f"Score:{score}")
             
             except Exception as e:
                 return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
         else:
             return JsonResponse({"error": "All fields are required."}, status=400)
-    
+
     # For GET request, render the form
     return render(request, "upload_form.html")
