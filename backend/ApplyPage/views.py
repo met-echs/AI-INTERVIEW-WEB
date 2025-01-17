@@ -22,11 +22,10 @@ def upload_resume(request):
                 file_content = file_content.strip()
 
                 # For now, print the data to the console
-                print(f"Name: {name}")
-                print(f"Email: {email}")
-                print(f"File Content:\n{file_content}")
+                # print(f"Name: {name}")
+                # print(f"Email: {email}")
+                # print(f"File Content:\n{file_content}")
                 
-                return JsonResponse({"message": "File uploaded successfully!"})
             
             except Exception as e:
                 return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
