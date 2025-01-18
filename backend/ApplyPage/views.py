@@ -64,13 +64,13 @@ def upload_resume(request):
                 You are tasked with evaluating a resume based on the following criteria:
 
 1. **Job Role**: Does the resume clearly specify a relevant job role for the position? The expected job role is: {job_role}.
-2. **Work Experience**: Does the resume list at least {min_years_experience} years of relevant work experience and if the experence is realted to the job role :{job_role} give extra 5 points?
-3. **Number of Projects**: Does the resume list at least {min_projects} relevant projects related to the job role:{job_role}?
+2. **Work Experience**: Does the resume list at least {min_years_experience} years of relevant work experience related to the job role: {job_role}? Give extra 5 points if the experience is highly relevant.
+3. **Number of Projects**: Does the resume list at least {min_projects} relevant projects related to the job role: {job_role}?
 4. **Certifications**: Does the resume include relevant certifications? The expected certifications are: {certifications_required if certifications_required else "None"}.
 5. **ATS Friendliness**: Is the resume formatted in a way that would be readable by an Applicant Tracking System (ATS)?
 
 - Each of the four criteria (job role, work experience, number of projects, and certifications) will be rated from 0 to 25, and their total score will contribute to a final score out of 100.
-- If any of the criteria are missing or poorly satisfied, reduce the score below 50.
+- If any of the criteria are missing or poorly satisfied, reduce the score accordingly.
 - If the job role criteria is not satisfied, set the overall score to 40.
 - If the resume is **not ATS-friendly**, set the score to **-1**.
 
@@ -93,8 +93,8 @@ Return only the final score as a **number** between -1 and 100, without any expl
                 if score >= 50:
                     # Generate a random username and password
                     password = generate_credentials(name)
-                    
-                    Resume.objects.create(
+                    try:
+                        Resume.objects.create(
                         name=name,
                         email=email,
                         password=password,
@@ -102,6 +102,9 @@ Return only the final score as a **number** between -1 and 100, without any expl
                         resume_link=file_path,
                         created_at=datetime.now()
                     )
+                    except Exception as e:
+                        return JsonResponse({"error": "Candidate already exists. Please check your email ID and try again."}, status=500)
+                    return JsonResponse({"success": "Resume uploaded successfully."}, status=201)
                 elif score < 50:
                     return JsonResponse({"error": "The resume did not meet the minimum criteria."}, status=400)
                 elif score == -1:
