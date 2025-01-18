@@ -3,8 +3,21 @@ from django.http import JsonResponse
 import PyPDF2
 from dashboard.models import EvaluationCriteria
 from groq import Groq
-
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+import os
+from datetime import datetime
+from .models import Resume
 client = Groq(api_key="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")
+
+
+def generate_credentials(name):
+    """Generate a random username and password."""
+    first_name = name.split()[0].capitalize()
+    current_year = datetime.now().year  # Get the current year
+    password = f"{first_name}@{current_year}" 
+    return password
+
 
 def upload_resume(request):
     if request.method == "POST":
@@ -14,6 +27,10 @@ def upload_resume(request):
         
         if name and email and file:
             try:
+                fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'resumes'))
+                filename = fs.save(file.name, file)
+                file_path = os.path.join('resumes', filename)
+                
                 # Read the content of the uploaded PDF file
                 pdf_reader = PyPDF2.PdfReader(file)
                 file_content = ""
@@ -64,14 +81,32 @@ Return only the final score as a **number** between -1 and 100, without any expl
                 completion = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",  # Use the best model for this task
                     messages=[{"role": "user", "content": prompt + resume_text}],
-                    temperature=0.5,  # Use a lower temperature for consistent evaluation
+                    temperature=0.3,  # Use a lower temperature for consistent evaluation
                     max_completion_tokens=2024,
                     top_p=1,
                     stream=False,  # Set to False since we only need the final score
                 )
+                score = 0
                 score = float(completion.choices[0].message.content.strip())
                 print(f"Score:{score}")
-            
+
+                if score >= 50:
+                    # Generate a random username and password
+                    password = generate_credentials(name)
+                    
+                    Resume.objects.create(
+                        name=name,
+                        email=email,
+                        password=password,
+                        resume_score=score,
+                        resume_link=file_path,
+                        created_at=datetime.now()
+                    )
+                elif score < 50:
+                    return JsonResponse({"error": "The resume did not meet the minimum criteria."}, status=400)
+                elif score == -1:
+                    return JsonResponse({"error": "The resume is not ATS-friendly."}, status=400)
+
             except Exception as e:
                 return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
         else:

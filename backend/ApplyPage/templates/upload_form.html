@@ -2,11 +2,43 @@
 <html>
 <head>
     <title>Upload Resume</title>
+    <script>
+        // Handle form submission
+        async function submitForm(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target; // Reference to the form element
+            const formData = new FormData(form); // Create FormData from the form
+
+            try {
+                // Send form data to the server using fetch
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json(); // Parse JSON response
+
+                if (response.ok) {
+                    // Show success alert
+                    alert(data.message || 'Resume uploaded successfully!');
+                } else {
+                    // Show error alert
+                    alert(data.error || 'An error occurred while uploading.');
+                }
+            } catch (error) {
+                // Handle unexpected errors
+                alert('An unexpected error occurred. Please try again.');
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Upload Your Resume</h1>
-    <form method="post" enctype="multipart/form-data">
+    <!-- Bind the submitForm function to the form's onsubmit event -->
+    <form method="post" enctype="multipart/form-data" onsubmit="submitForm(event)">
         {% csrf_token %}
+        
         <label for="id_name">Name:</label>
         <input type="text" name="name" id="id_name" required><br><br>
         
