@@ -22,6 +22,7 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('apply/', include('ApplyPage.urls')),
+    path('interview/', include('Interview.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('', TemplateView.as_view(template_name='index.html')),
 ]
