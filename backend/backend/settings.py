@@ -145,3 +145,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'justforb26@gmail.com'
 EMAIL_HOST_PASSWORD = 'xnvhbvthwhgwnknq'
+
+API_KEY = "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"
+
