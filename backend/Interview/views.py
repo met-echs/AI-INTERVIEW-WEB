@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import EmailMessage
-
+from backend.settings import DEEPGRAM_API_KEY
 @csrf_exempt
 def login_view(request):
     if request.method == 'POST':
@@ -21,7 +21,6 @@ def login_view(request):
                 return JsonResponse({
                     "message": "Login successful!",
                     "name": user.name,  # Assuming 'name' is a field in the 'Resume' model
-                    "redirect": "/home"
                 }, status=200)
                 # Return a JSON response for a successful login
                 #return JsonResponse({"message": "Login successful!", "redirect": "/home"}, status=200)
@@ -34,3 +33,4 @@ def login_view(request):
         form = LoginForm()
     
     return render(request, 'login.html', {'form': form})
+
