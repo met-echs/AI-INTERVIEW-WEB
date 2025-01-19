@@ -1,8 +1,10 @@
 # views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib import messages  # Import the messages module
 from .models import EvaluationCriteria
 from .forms import EvaluationCriteriaForm
+from .models import QuestionCriteria
+from .forms import QuestionCriteriaForm
 
 def manage_evaluation_criteria(request):
     # If the request is POST, handle form submission or delete action
@@ -35,4 +37,32 @@ def manage_evaluation_criteria(request):
     return render(request, 'evaluation_criteria_manage.html', {
         'form': form,
         'evaluation_criteria': evaluation_criteria
+    })
+def question_manage_criteria(request):
+    if request.method == 'POST':
+        if 'add_criteria' in request.POST:
+            form = QuestionCriteriaForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'New question criteria added successfully!')
+                return redirect('question_manage_criteria')
+            else:
+                messages.error(request, 'Failed to add question criteria. Please check the form.')
+        elif 'delete_criteria' in request.POST:
+            criteria_id = request.POST.get('criteria_id')
+            criteria = get_object_or_404(QuestionCriteria, id=criteria_id)
+            criteria.delete()
+            messages.success(request, 'Question criteria deleted successfully!')
+            return redirect('question_manage_criteria')
+        elif 'delete_all' in request.POST:
+            QuestionCriteria.objects.all().delete()
+            messages.success(request, 'All question criteria deleted successfully!')
+            return redirect('question_manage_criteria')
+    else:
+        form = QuestionCriteriaForm()
+
+    criteria_list = QuestionCriteria.objects.all()
+    return render(request, 'question_criteria_manage.html', {
+        'form': form,
+        'criteria_list': criteria_list
     })

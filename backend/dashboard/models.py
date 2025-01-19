@@ -9,3 +9,11 @@ class EvaluationCriteria(models.Model):
 
     def __str__(self):
         return self.job_role
+
+class QuestionCriteria(models.Model):
+    question = models.TextField()
+    specific_area = models.CharField(max_length=255)
+    keywords = models.TextField(help_text="Comma-separated keywords")
+
+    def __str__(self):
+        return self.question

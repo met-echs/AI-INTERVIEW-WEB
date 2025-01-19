@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path('create_criteria/', views.manage_evaluation_criteria, name='manage_evaluation_criteria'),
-    # path('delete-criteria/<int:criteria_id>/', views.delete_evaluation_criteria, name='delete_criteria'),
+    path('question_manage_criteria/', views.question_manage_criteria, name='question_manage_criteria'),
 ]
