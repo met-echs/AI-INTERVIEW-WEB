@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ApplyPage','dashboard','Interview',
-    'corsheaders',
+    'corsheaders','rest_framework',
 ]
 
 MIDDLEWARE = [

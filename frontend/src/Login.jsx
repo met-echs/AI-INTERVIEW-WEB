@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -7,21 +7,39 @@ const Login = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+  const [isLoading, setIsLoading] = useState(false); // Define isLoading
+  const navigate = useNavigate(); // Use navigate hook
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Set loading to true when submitting the form
 
     try {
-      const response = await axios.post("http://localhost:5000/login", {
-        email,
-        password,
+      const response = await fetch(`http://127.0.0.1:8000/interview/login/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          username: email,
+          password: password,
+        }),
       });
-      if (response.status === 200) {
-        setUser(response.data);
-        setError("");
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("isAuthenticated", "true"); // Store "true" as a string
+        setUser(data.user); // Set user details to state
+        alert("Login successful!");
+        navigate("/interview");
+      } else {
+        setError(data.message || "Invalid email or password.");
       }
     } catch (error) {
-      setError("Invalid email or password. Please try again.");
+      setError("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false); // Set loading to false after the request
     }
   };
 
@@ -65,8 +83,8 @@ const Login = () => {
             {showPassword ? "Hide" : "Show"}
           </button>
         </div>
-        <button type="submit" style={styles.button}>
-          Login
+        <button type="submit" style={styles.button} disabled={isLoading}>
+          {isLoading ? "Loading..." : "Login"}
         </button>
       </form>
       {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
