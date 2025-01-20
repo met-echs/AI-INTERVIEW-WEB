@@ -9,8 +9,8 @@ import os
 from datetime import datetime
 from .models import Resume
 from django.core.mail import send_mail
-
-client = Groq(api_key="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")
+from backend.settings import GROQ_API_KEY
+client = Groq(api_key=GROQ_API_KEY)
 
 def generate_credentials(name):
     """Generate a random username and password."""

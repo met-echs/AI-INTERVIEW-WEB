@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Start Interview</title>
+</head>
+<body>
+  <h1>Start the Interview</h1>
+  <form id="interviewForm">
+    <label for="name">Enter Interviewee's Name:</label>
+    <input type="text" id="name" name="name" placeholder="Enter name (optional)">
+    
+    <!-- CSRF token included here -->
+    {% csrf_token %}
+    
+    <button type="button" onclick="startInterview()">Start Interview</button>
+  </form>
+  
+  <audio id="audioPlayer" controls style="display: none;"></audio>
+
+  <script>
+    async function startInterview() {
+      const name = document.getElementById('name').value;
+
+      // Get CSRF token from the hidden input in the form
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrfToken // Include the CSRF token in the request
+        },
+        body: new URLSearchParams({ name })
+      });
+
+      const data = await response.json();
+      if (data.audioUrl) {
+        const audioPlayer = document.getElementById('audioPlayer');
+        audioPlayer.src = data.audioUrl;
+        audioPlayer.style.display = 'block';
+        audioPlayer.play();
+      } else {
+        alert('Error: ' + data.error);
+      }
+    }
+  </script>
+</body>
+</html>
