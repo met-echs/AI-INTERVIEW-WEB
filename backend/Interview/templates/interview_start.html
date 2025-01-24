@@ -1,50 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Start Interview</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Evaluation</title>
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
 </head>
 <body>
-  <h1>Start the Interview</h1>
-  <form id="interviewForm">
-    <label for="name">Enter Interviewee's Name:</label>
-    <input type="text" id="name" name="name" placeholder="Enter name (optional)">
-    
-    <!-- CSRF token included here -->
-    {% csrf_token %}
-    
-    <button type="button" onclick="startInterview()">Start Interview</button>
-  </form>
-  
-  <audio id="audioPlayer" controls style="display: none;"></audio>
+    <h1>User Evaluation System</h1>
+    <div id="question"></div>
+    <label class="switch">
+        <input type="checkbox" id="transcriptionSwitch" onclick="toggleTranscription()">
+        <span class="slider"></span>
+    </label>
+    <div id="result"></div>
+    <button onclick="nextQuestion()">Next Question</button>
 
-  <script>
-    async function startInterview() {
-      const name = document.getElementById('name').value;
+    <script>
+        let currentQuestionId = 1; // Initialize with the first question ID
+        let isTranscribing = false;
 
-      // Get CSRF token from the hidden input in the form
-      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        function toggleTranscription() {
+            isTranscribing = !isTranscribing;
+            if (isTranscribing) {
+                startTranscription();
+            } else {
+                stopTranscription();
+            }
+        }
 
-      const response = await fetch('/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-CSRFToken': csrfToken // Include the CSRF token in the request
-        },
-        body: new URLSearchParams({ name })
-      });
+        function startTranscription() {
+            fetch(`/start_transcription/?question_id=${currentQuestionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerText = data.status;
+                    fetchTranscription();
+                })
+                .catch(error => console.error('Error:', error));
+        }
 
-      const data = await response.json();
-      if (data.audioUrl) {
-        const audioPlayer = document.getElementById('audioPlayer');
-        audioPlayer.src = data.audioUrl;
-        audioPlayer.style.display = 'block';
-        audioPlayer.play();
-      } else {
-        alert('Error: ' + data.error);
-      }
-    }
-  </script>
+        function stopTranscription() {
+            fetch(`/stop_transcription/?question_id=${currentQuestionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerText = `Response: ${data.response}\nScore: ${data.score}`;
+                    // Move to the next question
+                    nextQuestion();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function fetchTranscription() {
+            if (isTranscribing) {
+                fetch('/live_transcribe/')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.transcription) {
+                            document.getElementById('result').innerText += ` ${data.transcription}`;
+                        } else if (data.error) {
+                            console.error('Error:', data.error);
+                        }
+                        if (isTranscribing) {
+                            setTimeout(fetchTranscription, 1000); // Fetch transcription every second
+                        }
+                    });
+            }
+        }
+
+        function fetchQuestion() {
+            fetch(`/question/${currentQuestionId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('question').innerText = data.question;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function nextQuestion() {
+            currentQuestionId++;
+            fetchQuestion();
+            document.getElementById('result').innerText = ""; // Clear previous result
+        }
+
+        // Fetch the initial question when the page loads
+        window.onload = fetchQuestion;
+    </script>
 </body>
 </html>

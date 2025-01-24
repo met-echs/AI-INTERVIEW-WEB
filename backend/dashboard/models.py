@@ -17,3 +17,10 @@ class QuestionCriteria(models.Model):
 
     def __str__(self):
         return self.question
+class Response(models.Model):
+    question = models.ForeignKey(QuestionCriteria, on_delete=models.CASCADE)
+    response_text = models.TextField()
+    score = models.IntegerField()
+
+    def __str__(self):
+        return f"Response for question: {self.question}"
