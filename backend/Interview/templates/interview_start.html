@@ -75,7 +75,7 @@
         }
 
         function startTranscription() {
-            fetch(`/start_transcription/?question_id=${currentQuestionId}`)
+            fetch(`/interview/start_transcription/?question_id=${currentQuestionId}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('result').innerText = data.status;
@@ -85,7 +85,7 @@
         }
 
         function stopTranscription() {
-            fetch(`/stop_transcription/?question_id=${currentQuestionId}`)
+            fetch(`/interview/stop_transcription/?question_id=${currentQuestionId}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('result').innerText = `Response: ${data.response}\nScore: ${data.score}`;
@@ -97,7 +97,7 @@
 
         function fetchTranscription() {
             if (isTranscribing) {
-                fetch('/live_transcribe/')
+                fetch('/interview/live_transcribe/')
                     .then(response => response.json())
                     .then(data => {
                         if (data.transcription) {
@@ -113,7 +113,7 @@
         }
 
         function fetchQuestion() {
-            fetch(`/question/${currentQuestionId}/`)
+            fetch(`/interview/question/${currentQuestionId}/`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('question').innerText = data.question;

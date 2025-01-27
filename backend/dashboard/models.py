@@ -10,7 +10,7 @@ class EvaluationCriteria(models.Model):
     def __str__(self):
         return self.job_role
 
-class QuestionCriteria(models.Model):
+class Question(models.Model):
     question = models.TextField()
     specific_area = models.CharField(max_length=255)
     keywords = models.TextField(help_text="Comma-separated keywords")
@@ -18,7 +18,7 @@ class QuestionCriteria(models.Model):
     def __str__(self):
         return self.question
 class Response(models.Model):
-    question = models.ForeignKey(QuestionCriteria, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     response_text = models.TextField()
     score = models.IntegerField()
 

@@ -1,7 +1,7 @@
 # forms.py
 from django import forms
 from .models import EvaluationCriteria
-from .models import QuestionCriteria
+from .models import Question
 
 class EvaluationCriteriaForm(forms.ModelForm):
     class Meta:
@@ -10,7 +10,7 @@ class EvaluationCriteriaForm(forms.ModelForm):
 
 class QuestionCriteriaForm(forms.ModelForm):
     class Meta:
-        model = QuestionCriteria
+        model = Question
         fields = ['question', 'specific_area', 'keywords']
         widgets = {
             'question': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),

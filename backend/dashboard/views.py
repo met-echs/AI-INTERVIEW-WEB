@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib import messages  # Import the messages module
 from .models import EvaluationCriteria
 from .forms import EvaluationCriteriaForm
-from .models import QuestionCriteria
+from .models import Question
 from .forms import QuestionCriteriaForm
 
 def manage_evaluation_criteria(request):
@@ -50,18 +50,25 @@ def question_manage_criteria(request):
                 messages.error(request, 'Failed to add question criteria. Please check the form.')
         elif 'delete_criteria' in request.POST:
             criteria_id = request.POST.get('criteria_id')
-            criteria = get_object_or_404(QuestionCriteria, id=criteria_id)
+            criteria = get_object_or_404(Question, id=criteria_id)
             criteria.delete()
             messages.success(request, 'Question criteria deleted successfully!')
-            return redirect('question_manage_criteria')
+
+            # Redirect to the next available question or show a message if no questions are left
+            next_question = Question.objects.order_by('id').first()
+            if next_question:
+                return redirect('question_detail', question_id=next_question.id)
+            else:
+                messages.info(request, 'No questions available.')
+                return redirect('question_manage_criteria')
         elif 'delete_all' in request.POST:
-            QuestionCriteria.objects.all().delete()
+            Question.objects.all().delete()
             messages.success(request, 'All question criteria deleted successfully!')
             return redirect('question_manage_criteria')
     else:
         form = QuestionCriteriaForm()
 
-    criteria_list = QuestionCriteria.objects.all()
+    criteria_list = Question.objects.all()
     return render(request, 'question_criteria_manage.html', {
         'form': form,
         'criteria_list': criteria_list
