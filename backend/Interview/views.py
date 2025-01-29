@@ -90,16 +90,33 @@ def evaluate_answer(question_text, response_text, specific_area, keywords):
     return score
 
 
-def get_question(request):
-    # Fetch the first question based on the smallest question_number
-    question = Question.objects.order_by('question_number').first()
 
-    if not question:
-        return JsonResponse({"error": "No questions available."}, status=404)
+def get_question(request):
+    question_number = request.GET.get('question_number')
+
+    if question_number:
+        try:
+            question_number = int(question_number)
+            question = Question.objects.get(question_number=question_number)
+        except (Question.DoesNotExist, ValueError):
+            return JsonResponse({
+                "error": "Okay, the questions are finished. You can exit the interview.",
+                "status": "finished"
+            }, status=404)
+    else:
+        # Fetch the first question based on the smallest question_number
+        question = Question.objects.order_by('question_number').first()
+        if not question:
+            return JsonResponse({
+                "error": "Okay, the questions are finished. You can exit the interview.",
+                "status": "finished"
+            }, status=404)
 
     return JsonResponse({
         "question_number": question.question_number,
-        "question_text": question.question,})
+        "question_text": question.question,
+        "status": "ok"
+    })
 
 
 def start_transcription(request):
@@ -143,14 +160,19 @@ def stop_transcription(request):
 
     # Fetch the next available question based on question_number order
     next_question = Question.objects.filter(question_number__gt=current_question_number).order_by('question_number').first()
+    print(f"Current question number: {current_question_number}")  # Debugging
+    print(f"Next question: {next_question.question}")  # Debugging
 
+    if next_question:
+        next_question_number = next_question.question_number
+        next_question_text = next_question.question
+    else:
+        next_question_number = None
+        next_question_text = "No more questions."
+    print(next_question_text)
     response_data = {
-        "current_question_number": current_question_number,
-        "response": response_text_accumulator,
-        "score": score,
-        "status": "Recording stopped",
-        "next_question_number": next_question.question_number if next_question else None,
-        "next_question_text": next_question.question if next_question else None
+        "next_question_number": next_question_number,
+        "next_question_text": next_question_text
     }
 
     # Reset response for next question
