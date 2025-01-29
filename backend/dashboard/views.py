@@ -62,7 +62,7 @@ def question_manage_criteria(request):
             else:
                 messages.info(request, 'No next question available.')
                 return redirect('question_manage_criteria')
-        elif 'delete_all' in request.POST:
+        elif 'delete_all' in request.POST:  
             Question.objects.all().delete()
             messages.success(request, 'All question criteria deleted successfully!')
             return redirect('question_manage_criteria')
@@ -76,3 +76,7 @@ def question_manage_criteria(request):
         'form': form,
         'criteria_list': criteria_list
     })
+
+def question_detail(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    return redirect('question_manage_criteria')
