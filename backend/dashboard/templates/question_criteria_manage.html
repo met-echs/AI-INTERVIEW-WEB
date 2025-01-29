@@ -38,6 +38,7 @@
         <h2>Existing Criteria</h2>
         {% for criteria in criteria_list %}
             <div class="criteria-card">
+                <p><strong>Question Number:</strong> {{ criteria.question_number }}</p>
                 <p><strong>Question:</strong> {{ criteria.question }}</p>
                 <p><strong>Specific Area:</strong> {{ criteria.specific_area }}</p>
                 <p><strong>Keywords:</strong> {{ criteria.keywords }}</p>
@@ -53,3 +54,4 @@
     </div>
 </body>
 </html>
+ 

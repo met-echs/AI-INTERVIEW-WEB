@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -62,9 +61,10 @@
     <button onclick="nextQuestion()">Next Question</button>
 
     <script>
-        let currentQuestionId = 1; // Initialize with the first question ID
+        let currentQuestionNumber = null; // Initialize with no question number
         let isTranscribing = false;
 
+        // Toggle transcription on/off
         function toggleTranscription() {
             isTranscribing = !isTranscribing;
             if (isTranscribing) {
@@ -74,27 +74,49 @@
             }
         }
 
+        // Start transcription for the current question
         function startTranscription() {
-            fetch(`/interview/start_transcription/?question_id=${currentQuestionId}`)
+            if (currentQuestionNumber === null) {
+                console.error("No question available for transcription.");
+                return;
+            }
+
+            fetch(`/interview/start_transcription/?question_number=${currentQuestionNumber}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('result').innerText = data.status;
                     fetchTranscription();
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error starting transcription:', error);
+                    document.getElementById('result').innerText = "Error starting transcription.";
+                });
         }
 
+        // Stop transcription for the current question
         function stopTranscription() {
-            fetch(`/interview/stop_transcription/?question_id=${currentQuestionId}`)
+            if (currentQuestionNumber === null) {
+                console.error("No question available to stop transcription.");
+                return;
+            }
+
+            fetch(`/interview/stop_transcription/?question_number=${currentQuestionNumber}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('result').innerText = `Response: ${data.response}\nScore: ${data.score}`;
-                    // Move to the next question
-                    nextQuestion();
+                    if (data.response && data.score !== undefined) {
+                        document.getElementById('result').innerText = `Response: ${data.response}\nScore: ${data.score}`;
+                    } else {
+                        document.getElementById('result').innerText = "Error with transcription data.";
+                    }
+                    nextQuestion();  // Automatically move to the next question
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error stopping transcription:', error);
+                    document.getElementById('result').innerText = "Error stopping transcription.";
+                });
         }
 
+        // Fetch live transcription updates
         function fetchTranscription() {
             if (isTranscribing) {
                 fetch('/interview/live_transcribe/')
@@ -103,32 +125,67 @@
                         if (data.transcription) {
                             document.getElementById('result').innerText += ` ${data.transcription}`;
                         } else if (data.error) {
-                            console.error('Error:', data.error);
+                            console.error('Error in transcription:', data.error);
                         }
+
                         if (isTranscribing) {
-                            setTimeout(fetchTranscription, 1000); // Fetch transcription every second
+                            setTimeout(fetchTranscription, 1000); // Poll every second
                         }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching live transcription:', error);
                     });
             }
         }
 
-        function fetchQuestion() {
-            fetch(`/interview/question/${currentQuestionId}/`)
+        // Fetch the question based on the current question number
+        function fetchQuestion(questionNumber = null) {
+            let url = questionNumber ? `/interview/get_question/?question_number=${questionNumber}` : `/interview/get_question/`; // Fetch first question if no number
+
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('question').innerText = data.question;
+                    if (data.error) {
+                        document.getElementById('question').innerText = "No more questions available.";
+                        return;
+                    }
+
+                    document.getElementById('question').innerText = data.question_text;
+                    currentQuestionNumber = data.question_number; // Update current question number
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error fetching question:', error);
+                    document.getElementById('question').innerText = "Error fetching question.";
+                });
         }
 
+        // Move to the next question
         function nextQuestion() {
-            currentQuestionId++;
-            fetchQuestion();
-            document.getElementById('result').innerText = ""; // Clear previous result
+            if (currentQuestionNumber === null) {
+                console.error("No current question to move forward from.");
+                return;
+            }
+
+            fetch(`/interview/stop_transcription/?question_number=${currentQuestionNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.next_question_number) {
+                        fetchQuestion(data.next_question_number); // Fetch next question dynamically
+                    } else {
+                        document.getElementById('question').innerText = "No more questions.";
+                    }
+
+                    document.getElementById('result').innerText = ""; // Clear previous result
+                })
+                .catch(error => {
+                    console.error('Error fetching next question:', error);
+                });
         }
 
-        // Fetch the initial question when the page loads
-        window.onload = fetchQuestion;
+        // Fetch the first question when the page loads
+        window.onload = function () {
+            fetchQuestion(); // Start by fetching the first question
+        };
     </script>
 </body>
 </html>

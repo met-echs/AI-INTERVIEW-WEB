@@ -51,15 +51,16 @@ def question_manage_criteria(request):
         elif 'delete_criteria' in request.POST:
             criteria_id = request.POST.get('criteria_id')
             criteria = get_object_or_404(Question, id=criteria_id)
+            criteria_number = criteria.question_number  # Capture the question number before deleting
             criteria.delete()
             messages.success(request, 'Question criteria deleted successfully!')
 
-            # Redirect to the next available question or show a message if no questions are left
-            next_question = Question.objects.order_by('id').first()
+            # Find the next question based on the question_number
+            next_question = Question.objects.filter(question_number__gt=criteria_number).order_by('question_number').first()
             if next_question:
                 return redirect('question_detail', question_id=next_question.id)
             else:
-                messages.info(request, 'No questions available.')
+                messages.info(request, 'No next question available.')
                 return redirect('question_manage_criteria')
         elif 'delete_all' in request.POST:
             Question.objects.all().delete()
@@ -68,7 +69,9 @@ def question_manage_criteria(request):
     else:
         form = QuestionCriteriaForm()
 
-    criteria_list = Question.objects.all()
+    # Get all questions ordered by question_number
+    criteria_list = Question.objects.all().order_by('question_number')
+
     return render(request, 'question_criteria_manage.html', {
         'form': form,
         'criteria_list': criteria_list

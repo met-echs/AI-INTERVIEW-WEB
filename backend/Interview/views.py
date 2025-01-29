@@ -48,20 +48,6 @@ def login_view(request):
     
     return render(request, 'login.html', {'form': form})
 
-def get_question(request, question_id):
-    try:
-        # Try to get the question with the given ID
-        question = Question.objects.get(id=question_id)
-    except Question.DoesNotExist:
-        # If not found, fetch the next available question by ID
-        question = Question.objects.order_by('id').first()
-        if not question:
-            # If no questions exist, return an error response
-            return JsonResponse({"error": "No questions available."}, status=404)
-
-    # Return the question text as JSON
-    return JsonResponse({"question": question.question})
-
 def evaluate_answer(question_text, response_text, specific_area, keywords):
     print("evaluate_answer")
     completion = client.chat.completions.create(
@@ -103,6 +89,19 @@ def evaluate_answer(question_text, response_text, specific_area, keywords):
     print(f"Score: {score}")
     return score
 
+
+def get_question(request):
+    # Fetch the first question based on the smallest question_number
+    question = Question.objects.order_by('question_number').first()
+
+    if not question:
+        return JsonResponse({"error": "No questions available."}, status=404)
+
+    return JsonResponse({
+        "question_number": question.question_number,
+        "question_text": question.question,})
+
+
 def start_transcription(request):
     global is_transcribing
     global response_text_accumulator
@@ -115,46 +114,50 @@ def start_transcription(request):
 def stop_transcription(request):
     global is_transcribing, response_text_accumulator
     is_transcribing = False
-    current_question_id = request.GET.get('question_id')
-    print(" I AM STOPPING TRANSCRIPTION")
-    if not current_question_id:
-        return JsonResponse({"error": "Question ID not provided"}, status=400)
-    
-    try:
-        # Try to get the question with the provided ID
-        question = Question.objects.get(id=current_question_id)
-    except Question.DoesNotExist:
-        # If the question does not exist, try to fetch the next available question
-        question = Question.objects.order_by('id').first()
-        if not question:
-            return JsonResponse({"error": "No questions available."}, status=404)
 
+    current_question_number = request.GET.get('question_number')
+
+    if not current_question_number:
+        return JsonResponse({"error": "Question number not provided"}, status=400)
+
+    try:
+        current_question_number = int(current_question_number)  # Convert to integer
+        question = Question.objects.get(question_number=current_question_number)
+    except (Question.DoesNotExist, ValueError):
+        return JsonResponse({"error": "Invalid question number."}, status=404)
+
+    # Evaluate the answer
     score = evaluate_answer(
-        question.question,       # The question text
-        response_text_accumulator,  # The transcription or response text
-        question.specific_area,  # The specific area
-        question.keywords        # The comma-separated keywords
+        question.question,       
+        response_text_accumulator,  
+        question.specific_area,  
+        question.keywords        
     )
 
-    # Save response and score
-    response = Response.objects.create(
+    # Save response
+    Response.objects.create(
         question=question,
         response_text=response_text_accumulator,
         score=score
     )
 
+    # Fetch the next available question based on question_number order
+    next_question = Question.objects.filter(question_number__gt=current_question_number).order_by('question_number').first()
+
     response_data = {
-        "question_id": current_question_id,
+        "current_question_number": current_question_number,
         "response": response_text_accumulator,
         "score": score,
-        "status": "Recording stopped"
+        "status": "Recording stopped",
+        "next_question_number": next_question.question_number if next_question else None,
+        "next_question_text": next_question.question if next_question else None
     }
 
-    # Reset for the next question
+    # Reset response for next question
     response_text_accumulator = ""
-    current_question_id = None
 
     return JsonResponse(response_data)
+
 
 def live_transcribe(request):
     global is_transcribing, response_text_accumulator

@@ -11,6 +11,7 @@ class EvaluationCriteria(models.Model):
         return self.job_role
 
 class Question(models.Model):
+    question_number = models.IntegerField(unique=True)
     question = models.TextField()
     specific_area = models.CharField(max_length=255)
     keywords = models.TextField(help_text="Comma-separated keywords")
