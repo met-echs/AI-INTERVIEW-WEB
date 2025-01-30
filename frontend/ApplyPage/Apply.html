@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INPACT</title>
+    <style>
+        /* Same styles as original page */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            font-size: 14px;
+            background-color: #f5f6fa;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 25px 50px;
+            background: #f0f0f0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none; /* Add this line to remove underline */
+        }
+        
+        /* Optional: Add hover effect match */
+        .logo:hover {
+            color: #2c3e50; /* Maintain same color on hover */
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #34495e;
+            font-weight: 500;
+            font-size: 22px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        /* Apply Form Styles */
+        .apply-container {
+            padding: 30px;
+            max-width: 560px;
+            margin: 60px auto;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .apply-form input {
+            display: block;
+            width: 96%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .apply-form button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
+        }
+
+        .apply-form button:hover {
+            background-color: #2980b9;
+        }
+
+        .file-error {
+            color: red;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="Home.html" class="logo">INPAT</a>
+        <div class="nav-links">
+            <a href="Apply.html">Apply</a>
+            <a href="Login.html">Login</a>
+            <a href="Contact.html">Contact</a>
+        </div>
+    </nav>
+
+    <div class="apply-container">
+        <h2 style="margin-bottom: 20px;"><strong>Fill the details</strong></h2>
+        <form class="apply-form" method="post" enctype="multipart/form-data" onsubmit="submitForm(event)">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Name" id="id_name" required>
+            <input type="email" name="email" placeholder="Email address" id="id_email" required>
+            <input type="file" name="file" id="id_file" accept=".pdf" required onchange="handleFileChange(event)">
+            <p class="file-error" id="fileError"></p>
+            <p style="margin-bottom: 20px;">File format must be .pdf and less than 2MB</p>
+            <button type="submit">Apply now</button>
+        </form>
+    </div>
+
+    <script>
+        const maxFileSize = 2 * 1024 * 1024; // 2MB
+
+        function handleFileChange(event) {
+            const file = event.target.files[0];
+            const errorElement = document.getElementById('fileError');
+            
+            if (file && file.size > maxFileSize) {
+                errorElement.textContent = "File size must not exceed 2 MB";
+                event.target.value = ''; // Clear the file input
+            } else {
+                errorElement.textContent = "";
+            }
+        }
+
+        async function submitForm(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target; // Reference to the form element
+            const formData = new FormData(form); // Create FormData from the form
+
+            try {
+                // Send form data to the server using fetch
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json(); // Parse JSON response
+
+                if (response.ok) {
+                    // Show success alert
+                    alert(data.message || 'Resume uploaded successfully!');
+                    window.location.href = "Thankyou.html"; // Redirect to thank-you page
+                } else {
+                    // Show error alert
+                    alert(data.error || 'An error occurred while uploading.');
+                }
+            } catch (error) {
+                // Handle unexpected errors
+                alert('An unexpected error occurred. Please try again.');
+            }
+        }
+    </script>
+
+</body>
+</html>

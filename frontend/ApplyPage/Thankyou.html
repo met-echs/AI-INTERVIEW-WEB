@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INPACT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            font-size: 14px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 25px 50px;
+            background: #f0f0f0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            color: #2c3e50;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .home-btn {
+            padding: 10px 20px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .home-btn:hover {
+            background: #333;
+        }
+
+        .thank-you-container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .thank-you-container h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .thank-you-container p {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="Home.html" class="logo">INPACT</a>
+        <div class="nav-links">
+            <button class="home-btn" onclick="window.location.href='/'">Back to Home</button>
+        </div>
+    </nav>
+
+    <div class="thank-you-container">
+        <h1>Thank You for Applying!</h1><br>
+        <p>Your application has been submitted successfully.</p>
+        <p>You will receive a response at the email address you provided.</p>
+    </div>
+</body>
+</html>
