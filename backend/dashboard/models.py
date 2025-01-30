@@ -10,10 +10,18 @@ class EvaluationCriteria(models.Model):
     def __str__(self):
         return self.job_role
 
-class QuestionCriteria(models.Model):
+class Question(models.Model):
+    question_number = models.IntegerField(unique=True)
     question = models.TextField()
     specific_area = models.CharField(max_length=255)
     keywords = models.TextField(help_text="Comma-separated keywords")
 
     def __str__(self):
         return self.question
+class Response(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    response_text = models.TextField()
+    score = models.IntegerField()
+
+    def __str__(self):
+        return f"Response for question: {self.question}"
