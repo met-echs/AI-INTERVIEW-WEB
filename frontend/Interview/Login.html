@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INPAT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f6fa;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 4rem;
+            background: #f0f0f0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #34495e;
+            font-weight: 500;
+            font-size: 22px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        .login-container {
+            background: white;
+            max-width: 480px;
+            margin: 4rem auto;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .password-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding-right: 1rem;
+            margin-bottom: 1.5rem;
+            /* Add margin to bottom */
+        }
+
+        .password-container input {
+            border: none;
+            flex: 1;
+        }
+
+        .toggle-password {
+            background: none;
+            border: none;
+            color: #3498db;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 0.5rem;
+            /* Add margin to top */
+        }
+
+        .login-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none;
+            /* Add this line to remove underline */
+        }
+
+        /* Optional: Add hover effect match */
+        .logo:hover {
+            color: #2c3e50;
+            /* Maintain same color on hover */
+        }
+
+        /* Base style for all messages */
+        .message {
+            padding: 12px 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Success message style */
+        .message.success {
+            background-color: #28a745;
+            color: white;
+            border: 1px solid #218838;
+        }
+
+        /* Error message style */
+        .message.error {
+            background-color: #dc3545;
+            color: white;
+            border: 1px solid #c82333;
+        }
+
+        /* Optional: Add a fade-out effect */
+        .message.success,
+        .message.error {
+            opacity: 1;
+        }
+
+        .message.success:hover,
+        .message.error:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="{% url 'home' %}" class="logo">INPAT</a>
+        <div class="nav-links">
+            <a href="{% url 'apply' %}">Apply</a>
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'contact' %}">Contact</a>
+        </div>
+    </nav>
+
+    <div class="login-container">
+        <h2>Welcome back</h2>
+        <p class="subtitle">Please enter your details to sign in.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="input-group">
+                <!-- Render the username field -->
+                {{ form.username.errors }}
+                <input type="text" name="username" placeholder="Enter your username..."
+                    value="{{ form.username.value|default:'' }}">
+            </div>
+
+            <div class="password-container">
+                <!-- Render the password field -->
+                {{ form.password.errors }}
+                <input type="password" name="password" placeholder="Password"
+                    value="{{ form.password.value|default:'' }}">
+                <button type="button" class="toggle-password">Show</button>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        <!-- Display any messages -->
+        {% for message in messages %}
+    <p class="message {% if message.level == 'success' %}success{% endif %} {% if message.level == 'error' %}error{% endif %}">{{ message }}</p>
+{% endfor %}
+    </div>
+
+    <script>
+        const togglePassword = document.querySelector('.toggle-password');
+        const passwordField = document.querySelector('input[type="password"]');
+
+        togglePassword.addEventListener('click', () => {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            togglePassword.textContent = type === 'password' ? 'Show' : 'Hide';
+        });
+    </script>
+</body>
+
+</html>
