@@ -50,6 +50,8 @@ def login_view(request):
 
 def evaluate_answer(question_text, response_text, specific_area, keywords):
     print("evaluate_answer")
+    print(f"question:{question_text}")
+    print(f"response:{response_text}")                                                      
     completion = client.chat.completions.create(
     model="gemma2-9b-it",
     messages=[{
@@ -160,8 +162,8 @@ def stop_transcription(request):
 
     # Fetch the next available question based on question_number order
     next_question = Question.objects.filter(question_number__gt=current_question_number).order_by('question_number').first()
-    print(f"Current question number: {current_question_number}")  # Debugging
-    print(f"Next question: {next_question.question}")  # Debugging
+    # print(f"Current question number: {current_question_number}")  # Debugging
+    # print(f"Next question: {next_question.question}")  # Debugging
 
     if next_question:
         next_question_number = next_question.question_number
@@ -169,7 +171,7 @@ def stop_transcription(request):
     else:
         next_question_number = None
         next_question_text = "No more questions."
-    print(next_question_text)
+    # print(next_question_text)
     response_data = {
         "next_question_number": next_question_number,
         "next_question_text": next_question_text
