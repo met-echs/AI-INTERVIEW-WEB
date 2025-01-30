@@ -20,7 +20,7 @@ response_text_accumulator = ""
 current_question_id = 0
 
 def index(request):
-    return render(request, 'interview_start.html')
+    return render(request, 'interview/interview_start.html')
 
 def interview_test(request):
     return render(request, 'interview/interview_test.html')
