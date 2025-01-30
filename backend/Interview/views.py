@@ -22,6 +22,8 @@ current_question_id = 0
 def index(request):
     return render(request, 'interview_start.html')
 
+def interview_test(request):
+    return render(request, 'interview/interview_test.html')
 @csrf_exempt
 def login_view(request):
     if request.method == 'POST':
@@ -33,11 +35,9 @@ def login_view(request):
             try:
                 user = Resume.objects.get(email=username, password=password)
                 messages.success(request, "Login successful!")
-                # return JsonResponse({
-                #     "message": "Login successful!",
-                #     "name": user.name,  # Assuming 'name' is a field in the 'Resume' model
-                # }, status=200)
-                return render(request, 'interview_start.html', {'message': 'Resume uploaded and email sent successfully!'})
+                return render(request, 'interview/interview_home.html', {
+                    'name': user.name  # Pass the user's name to the template
+                })
             except Resume.DoesNotExist:
                 messages.error(request, "Invalid username or password.")
                 return JsonResponse({"error": "Invalid username or password."}, status=400)
