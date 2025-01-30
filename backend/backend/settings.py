@@ -26,24 +26,6 @@ SECRET_KEY = 'django-insecure-u$#e_!a+__q0h*ivye_evg37pj^(l)3j)0&@cquui!2g8-y-(=
 DEBUG = True
 
 ALLOWED_HOSTS = []
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
-CORS_ALLOW_ALL_ORIGINS = True
-# Application definition
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-]
-# settings.py
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
-CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
-# Optional: For development only!
-CORS_ALLOW_ALL_ORIGINS = True  #
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = False  
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -53,7 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ApplyPage','dashboard','Interview',
-    'corsheaders','rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -64,7 +45,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -73,7 +54,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, '..', 'frontend', 'build'),
+            os.path.join(BASE_DIR, '..', 'frontend'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -143,7 +124,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, '..', 'frontend', 'build', 'static'),
+    os.path.join(BASE_DIR, '..', 'frontend'),
 ]
 
 # Default primary key field type
