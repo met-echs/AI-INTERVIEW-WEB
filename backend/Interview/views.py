@@ -20,8 +20,16 @@ response_text_accumulator = ""
 current_question_id = 0
 
 def index(request):
+<<<<<<< HEAD
     return render(request, 'interview_start.html')
 
+=======
+    return render(request, 'interview/interview_start.html')
+    test
+
+def interview_test(request):
+    return render(request, 'interview/interview_test.html')
+>>>>>>> 8602c7519127dff9a4deb4e8dd11b4054d4eb0d2
 @csrf_exempt
 def login_view(request):
     if request.method == 'POST':
@@ -33,11 +41,10 @@ def login_view(request):
             try:
                 user = Resume.objects.get(email=username, password=password)
                 messages.success(request, "Login successful!")
-                # return JsonResponse({
-                #     "message": "Login successful!",
-                #     "name": user.name,  # Assuming 'name' is a field in the 'Resume' model
-                # }, status=200)
-                return render(request, 'interview_start.html', {'message': 'Resume uploaded and email sent successfully!'})
+
+                return render(request, 'interview/interview_home.html', {
+                    'name': user.name  # Pass the user's name to the template
+                })
             except Resume.DoesNotExist:
                 messages.error(request, "Invalid username or password.")
                 return JsonResponse({"error": "Invalid username or password."}, status=400)
@@ -46,7 +53,7 @@ def login_view(request):
     else:
         form = LoginForm()
     
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'interview/Login.html', {'form': form})
 
 def evaluate_answer(question_text, response_text, specific_area, keywords):
     print("evaluate_answer")
@@ -117,7 +124,11 @@ def get_question(request):
     return JsonResponse({
         "question_number": question.question_number,
         "question_text": question.question,
+<<<<<<< HEAD
         "status": "ok"
+=======
+        # "status": "ok"
+>>>>>>> 8602c7519127dff9a4deb4e8dd11b4054d4eb0d2
     })
 
 

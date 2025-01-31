@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Preparation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 20px 50px;
+            background: #f0f0f0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-decoration: none;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+        
+        .logo:hover {
+            color: #2c3e50;
+        }
+        
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            gap: 30px;
+            align-items: center;
+            margin-top: 80px;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .left-section {
+            flex: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .right-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 655px;
+            aspect-ratio: 10/7;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        #previewVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .device-selectors {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        select {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.007);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        select:hover {
+            background: rgba(255, 255, 255, 0.7);
+            border-color: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: rgba(0, 123, 255, 0.3);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        #joinButton {
+            padding: 12px 20px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        #joinButton:hover {
+            background: #0056b3;
+        }
+
+        #joinButton a {
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        /* Volume Indicator Styles */
+        .volume-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 3px;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 8px;
+            border-radius: 4px;
+        }
+
+        .volume-bar {
+            width: 4px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.1s ease;
+        }
+
+        .volume-bar.active {
+            background: #4CAF50;
+        }
+
+        .text-field {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}" class="logo">INPAT</a>
+    </nav>
+
+    <div class="container">
+        <!-- Left Section -->
+        <div class="left-section">
+            <div class="video-container">
+                <video id="previewVideo" autoplay muted></video>
+                <!-- Volume Indicator -->
+                <div class="volume-indicator" id="volumeIndicator">
+                    <div class="volume-bar"></div>
+                    <div class="volume-bar"></div>
+                    <div class="volume-bar"></div>
+                    <div class="volume-bar"></div>
+                    <div class="volume-bar"></div>
+                </div>
+                <div class="controls">
+                    <button class="control-btn" id="micToggle">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="control-btn" id="cameraToggle">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="control-btn" id="switchCamera">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="device-selectors">
+                <select id="micSelect"></select>
+                <select id="cameraSelect"></select>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="right-section">
+            <div class="text-field">
+            <p>Ready to join?</p>
+         </div>
+
+            <button id="joinButton"><a href="{% url 'interview' %}">Join now</a></button>
+        </div>
+    </div>
+
+    <script>
+        let currentStream = null;
+        let isMicOn = true;
+        let isCameraOn = true;
+        let devices = {
+            audioInput: [],
+            videoInput: []
+        };
+
+        // Audio analysis variables
+        let audioContext = null;
+        let analyser = null;
+        let microphone = null;
+        let javascriptNode = null;
+
+        const videoElement = document.getElementById('previewVideo');
+        const micSelect = document.getElementById('micSelect');
+        const cameraSelect = document.getElementById('cameraSelect');
+        const micToggle = document.getElementById('micToggle');
+        const cameraToggle = document.getElementById('cameraToggle');
+        const switchCamera = document.getElementById('switchCamera');
+        const joinButton = document.getElementById('joinButton');
+        const volumeIndicator = document.getElementById('volumeIndicator');
+
+        function setupAudioAnalyzer(stream) {
+            if (audioContext) return; // Already setup
+            
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            
+            microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+            
+            updateVolumeIndicator();
+        }
+
+        function updateVolumeIndicator() {
+            if (!analyser) return;
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+            
+            let average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            average = Math.min(Math.max(average, 0), 100);
+            
+            const bars = document.querySelectorAll('.volume-bar');
+            const activeBars = Math.ceil((average / 100) * bars.length);
+
+            bars.forEach((bar, index) => {
+                bar.classList.toggle('active', index < activeBars);
+            });
+
+            requestAnimationFrame(updateVolumeIndicator);
+        }
+
+        async function getDevices() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                return {
+                    audioInput: devices.filter(d => d.kind === 'audioinput'),
+                    videoInput: devices.filter(d => d.kind === 'videoinput')
+                };
+            } catch (error) {
+                console.error('Error getting devices:', error);
+                return { audioInput: [], videoInput: [] };
+            }
+        }
+
+        function updateDeviceSelectors() {
+            micSelect.innerHTML = devices.audioInput
+                .map(device => `<option value="${device.deviceId}">${device.label || 'Microphone'}</option>`)
+                .join('');
+
+            cameraSelect.innerHTML = devices.videoInput
+                .map(device => `<option value="${device.deviceId}">${device.label || 'Camera'}</option>`)
+                .join('');
+        }
+
+        async function startPreview() {
+            stopPreview();
+            
+            const constraints = {
+                video: { deviceId: cameraSelect.value ? { exact: cameraSelect.value } : true },
+                audio: { deviceId: micSelect.value ? { exact: micSelect.value } : true }
+            };
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                videoElement.srcObject = stream;
+                currentStream = stream;
+                
+                setupAudioAnalyzer(stream);
+                devices = await getDevices();
+                updateDeviceSelectors();
+            } catch (error) {
+                console.error('Error starting preview:', error);
+                alert('Failed to access media devices. Please check your permissions.');
+            }
+        }
+
+        function stopPreview() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+            
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+                analyser = null;
+            }
+        }
+
+        micToggle.addEventListener('click', () => {
+            isMicOn = !isMicOn;
+            micToggle.querySelector('i').className = isMicOn ? 'fas fa-microphone' : 'fas fa-microphone-slash';
+            if (currentStream) {
+                currentStream.getAudioTracks().forEach(track => track.enabled = isMicOn);
+            }
+        });
+
+        cameraToggle.addEventListener('click', () => {
+            isCameraOn = !isCameraOn;
+            cameraToggle.querySelector('i').className = isCameraOn ? 'fas fa-video' : 'fas fa-video-slash';
+            if (currentStream) {
+                currentStream.getVideoTracks().forEach(track => track.enabled = isCameraOn);
+            }
+        });
+
+        switchCamera.addEventListener('click', async () => {
+            const cameras = devices.videoInput;
+            const currentIndex = cameras.findIndex(c => c.deviceId === cameraSelect.value);
+            const newIndex = (currentIndex + 1) % cameras.length;
+            cameraSelect.value = cameras[newIndex].deviceId;
+            await startPreview();
+        });
+
+        micSelect.addEventListener('change', startPreview);
+        cameraSelect.addEventListener('change', startPreview);
+
+        (async function init() {
+            devices = await getDevices();
+            updateDeviceSelectors();
+            await startPreview();
+        })();
+    </script>
+</body>
+</html>

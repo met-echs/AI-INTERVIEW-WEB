@@ -200,4 +200,4 @@ Return only the final score as a **number** between -1 and 100, without any expl
             return JsonResponse({"error": "All fields are required."}, status=400)
 
     # For GET request, render the form
-    return render(request, "upload_form.html")
+    return render(request, "ApplyPage/Apply.html")

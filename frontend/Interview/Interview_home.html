@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INPACT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            font-size: 14px;
+            background-color: #f5f6fa;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 25px 50px;
+            background: #f0f0f0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none; /* Add this line to remove underline */
+        }
+        
+        /* Optional: Add hover effect match */
+        .logo:hover {
+            color: #2c3e50; /* Maintain same color on hover */
+        }
+
+        .interview-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 50px auto;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        ul {
+            text-align: left;
+            padding-left: 20px;
+            margin: 20px 0;
+        }
+
+        .start-button {
+            background-color: #2980b9;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .lighter-text {
+            color: #888;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .interview-container {
+                padding: 15px;
+                margin: 30px auto;
+            }
+            
+            nav {
+                padding: 15px 20px;
+            }
+            
+            .start-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}" class="logo">INPAT</a>
+    </nav>
+
+    <div class="interview-container">
+        <h1>Welcome to your AI Interview</h1><br>
+        <p>Hello {{ name }},</p><br>
+        <p>We’re excited to have you here! Before starting, please review the following guidelines:</p>
+        <ul>
+            <li>Allow access to your microphone and camera.</li>
+            <li>This session will be recorded.</li>
+            <li>This is a one-time interview, so ensure you are ready.</li>
+            <li>Find a quiet, well-lit place with a stable internet connection.</li>
+            <li>The session will take approximately 15-20 minutes.</li>
+        </ul>
+        <a href="{% url 'interview_test' %}" ><button class="start-button">
+            Start Interview
+        </button></a>
+        <p class="lighter-text">By clicking Start, you agree to our privacy and recording policies.</p>
+    </div>
+
+    <script>
+        
+    </script>
+</body>
+</html>
