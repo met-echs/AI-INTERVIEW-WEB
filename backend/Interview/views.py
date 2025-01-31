@@ -20,16 +20,11 @@ response_text_accumulator = ""
 current_question_id = 0
 
 def index(request):
-<<<<<<< HEAD
-    return render(request, 'interview_start.html')
-
-=======
     return render(request, 'interview/interview_start.html')
     test
 
 def interview_test(request):
     return render(request, 'interview/interview_test.html')
->>>>>>> 8602c7519127dff9a4deb4e8dd11b4054d4eb0d2
 @csrf_exempt
 def login_view(request):
     if request.method == 'POST':
@@ -124,11 +119,7 @@ def get_question(request):
     return JsonResponse({
         "question_number": question.question_number,
         "question_text": question.question,
-<<<<<<< HEAD
         "status": "ok"
-=======
-        # "status": "ok"
->>>>>>> 8602c7519127dff9a4deb4e8dd11b4054d4eb0d2
     })
 
 
