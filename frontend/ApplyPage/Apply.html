@@ -102,11 +102,11 @@
 </head>
 <body>
     <nav>
-        <a href="Home.html" class="logo">INPAT</a>
+        <a href="{% url 'home' %}" class="logo">INPAT</a>
         <div class="nav-links">
-            <a href="Apply.html">Apply</a>
-            <a href="Login.html">Login</a>
-            <a href="Contact.html">Contact</a>
+            <a href="{% url 'apply' %}">Apply</a>
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'contact' %}">Contact</a>
         </div>
     </nav>
 

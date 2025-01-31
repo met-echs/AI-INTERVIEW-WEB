@@ -117,7 +117,7 @@ def get_question(request):
     return JsonResponse({
         "question_number": question.question_number,
         "question_text": question.question,
-        "status": "ok"
+        # "status": "ok"
     })
 
 
