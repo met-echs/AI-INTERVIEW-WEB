@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'demoai',
+        'NAME': 'demoaiinterview',
         'HOST':'localhost',
         'PORT':'5432',
         'USER':'postgres',

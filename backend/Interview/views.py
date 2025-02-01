@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from ApplyPage.models import Resume
+from ApplyPage.models import Candidate
 from .forms import LoginForm
 from django.contrib import messages
 from django.http import JsonResponse
@@ -9,8 +9,9 @@ from backend.settings import DEEPGRAM_API_KEY
 from backend.settings import GROQ_API_KEY
 from groq import Groq
 import speech_recognition as sr
-from dashboard.models import Question, Response  # Ensure the Response model is imported
-
+from dashboard.models import Question , EvaluationCriteria # Ensure the Response model is imported
+from .models import Response , Interview
+from django.core.exceptions import ObjectDoesNotExist
 client = Groq(api_key=GROQ_API_KEY)
 
 recognizer = sr.Recognizer()
@@ -18,13 +19,13 @@ microphone = sr.Microphone()
 is_transcribing = False
 response_text_accumulator = ""
 current_question_id = 0
-
+global_user = None
 def index(request):
-    return render(request, 'interview/interview_start.html')
-    test
+    return render(request, 'interview/demo.html')
 
 def interview_test(request):
     return render(request, 'interview/interview_test.html')
+
 @csrf_exempt
 def login_view(request):
     if request.method == 'POST':
@@ -32,22 +33,19 @@ def login_view(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            
             try:
-                user = Resume.objects.get(email=username, password=password)
+                user = Candidate.objects.get(email=username, password=password)
+                # Store user ID in session
+                request.session['candidate_id'] = user.pk
                 messages.success(request, "Login successful!")
-
-                return render(request, 'interview/interview_home.html', {
-                    'name': user.name  # Pass the user's name to the template
-                })
-            except Resume.DoesNotExist:
+                return render(request, 'interview/interview_home.html', {'name': user.name})
+            except Candidate.DoesNotExist:
                 messages.error(request, "Invalid username or password.")
-                return JsonResponse({"error": "Invalid username or password."}, status=400)
         else:
-            return JsonResponse({"error": "Invalid form data."}, status=400)
+            messages.error(request, "Invalid form data.")
+        return redirect('login')  # Redirect to avoid resubmission
     else:
         form = LoginForm()
-    
     return render(request, 'interview/Login.html', {'form': form})
 
 def evaluate_answer(question_text, response_text, specific_area, keywords):
@@ -132,12 +130,26 @@ def start_transcription(request):
     print(" I AM STARTING TRANSCRIPTION")
     return JsonResponse(response_data)
 
+
+# Global variable to accumulate response text
+is_transcribing = False
+response_text_accumulator = ""
+
 def stop_transcription(request):
     global is_transcribing, response_text_accumulator
     is_transcribing = False
 
-    current_question_number = request.GET.get('question_number')
+    # Get interview_id from the request
+    interview_id = request.GET.get('interview_id')
+    if not interview_id:
+        print("Interview ID not provided")
+        # return JsonResponse({"error": "Interview ID not provided"}, status=400)
 
+    # Fetch the interview object
+    interview = get_object_or_404(Interview, pk=interview_id)
+
+    # Get the question number from the request
+    current_question_number = request.GET.get('question_number')
     if not current_question_number:
         return JsonResponse({"error": "Question number not provided"}, status=400)
 
@@ -155,34 +167,35 @@ def stop_transcription(request):
         question.keywords        
     )
 
-    # Save response
+    # Save response with interview reference
     Response.objects.create(
         question=question,
         response_text=response_text_accumulator,
-        score=score
+        score=score,
+        interview=interview  # Now interview is properly fetched
     )
 
     # Fetch the next available question based on question_number order
     next_question = Question.objects.filter(question_number__gt=current_question_number).order_by('question_number').first()
-    # print(f"Current question number: {current_question_number}")  # Debugging
-    # print(f"Next question: {next_question.question}")  # Debugging
 
     if next_question:
         next_question_number = next_question.question_number
         next_question_text = next_question.question
     else:
+        print("here is the issue")
         next_question_number = None
         next_question_text = "No more questions."
-    # print(next_question_text)
+
     response_data = {
         "next_question_number": next_question_number,
         "next_question_text": next_question_text
     }
 
-    # Reset response for next question
+    # Reset response for the next question
     response_text_accumulator = ""
 
     return JsonResponse(response_data)
+
 
 
 def live_transcribe(request):

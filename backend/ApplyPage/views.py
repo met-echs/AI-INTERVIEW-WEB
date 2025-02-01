@@ -7,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 import os
 from datetime import datetime
-from .models import Resume
+from .models import Candidate
 from django.core.mail import send_mail
 from backend.settings import GROQ_API_KEY
 client = Groq(api_key=GROQ_API_KEY)
@@ -88,7 +88,7 @@ Return only the final score as a **number** between -1 and 100, without any expl
                     password = generate_credentials(name)
                     print(password)
                     try:
-                        Resume.objects.create(
+                        Candidate.objects.create(
                             name=name,
                             email=email,
                             password=password,

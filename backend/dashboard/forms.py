@@ -11,7 +11,7 @@ class EvaluationCriteriaForm(forms.ModelForm):
 class QuestionCriteriaForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['question_number', 'question', 'specific_area', 'keywords']
+        fields = ['question_number', 'question', 'specific_area', 'keywords']  # Ensure these fields exist in the model
         widgets = {
             'question_number': forms.NumberInput(attrs={'class': 'form-control'}),
             'question': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
