@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'demoaiinterview',
+        'NAME': 'aiinterview',
         'HOST':'localhost',
         'PORT':'5432',
         'USER':'postgres',
@@ -85,7 +85,10 @@ DATABASES = {
     }
 }
 
+import os
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

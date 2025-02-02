@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('login/', views.login_view, name='login'), 
+    path('join/', views.join_interview, name='join'),
     path('interview_test/', views.interview_test, name='interview_test'),
     path('interview/', views.index, name='interview'),
     path('question/<int:question_id>/', views.get_question, name='get_question'),

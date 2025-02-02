@@ -113,8 +113,9 @@ Return only the final score as a **number** between -1 and 100, without any expl
                                 <p style="color: #777;">Here are your account details:</p>
                                 <p style="color: #777;"><strong>Username:</strong> {email}</p>
                                 <p style="color: #777;"><strong>Password:</strong> {password}</p>
-                                <a href="http://localhost:3000/login?username={email}&password={password}" style="background-color: #4CAF50; color: white; padding: 15px 25px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px;">
-                                    Login Now to attend the interview
+                                <a href="http://127.0.0.1:8000/interview/login/?username={email}&password={password}" 
+                                style="background-color: #4CAF50; color: white; padding: 15px 25px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px;">
+                                Login Now to attend the interview
                                 </a>
                                 <p style="color: #777;">Best regards,<br>Your Team</p>
                             </div>

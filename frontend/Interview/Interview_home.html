@@ -104,14 +104,15 @@
             <li>Find a quiet, well-lit place with a stable internet connection.</li>
             <li>The session will take approximately 15-20 minutes.</li>
         </ul>
-        <a href="{% url 'interview_test' %}" ><button class="start-button">
+        <a href="{% url 'join' %}" ><button class="start-button">
             Start Interview
         </button></a>
         <p class="lighter-text">By clicking Start, you agree to our privacy and recording policies.</p>
     </div>
 
     <script>
-        
+        var interviewId = "{{ interview_id }}"; // Pass from Django to JavaScript
+        sessionStorage.setItem("interview_id", interviewId); // Store for later use
     </script>
 </body>
 </html>

@@ -27,3 +27,5 @@ def contact_form(request):
     return render(request, 'Home/Contact.html')
 
 
+
+

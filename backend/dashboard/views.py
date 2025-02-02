@@ -5,7 +5,7 @@ from .models import EvaluationCriteria
 from .forms import EvaluationCriteriaForm
 from .models import Question
 from .forms import QuestionCriteriaForm
-
+from ApplyPage.models import Candidate
 def manage_evaluation_criteria(request):
     # If the request is POST, handle form submission or delete action
     if request.method == 'POST':
@@ -80,3 +80,10 @@ def question_manage_criteria(request):
 def question_detail(request, question_id):
     question = get_object_or_404(Question, id=question_id)
     return redirect('question_manage_criteria')
+
+def high_scores(request):
+    # Get all candidates ordered by resume_score in descending order
+    candidates = Candidate.objects.all().order_by('-resume_score')
+
+    # Pass the candidate data to the template
+    return render(request, 'rank.html', {'candidates': candidates})

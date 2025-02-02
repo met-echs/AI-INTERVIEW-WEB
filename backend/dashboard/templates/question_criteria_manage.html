@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Question Criteria</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <style>
         body {
             padding: 20px;
@@ -13,45 +14,147 @@
         .criteria-card {
             background: #ffffff;
             padding: 20px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
         }
-        .form-control, .btn {
+
+        .criteria-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .criteria-card p {
+            margin: 5px 0;
+        }
+
+        .modal-content {
+            border-radius: 12px;
+        }
+
+        .modal-header {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .modal-footer .btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .modal-footer .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .add-btn-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        .add-btn-container .btn {
+            background-color: #28a745;
+            color: white;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            padding: 15px 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .add-btn-container .btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-warning, .btn-danger {
+            transition: transform 0.2s ease;
+        }
+
+        .btn-warning:hover, .btn-danger:hover {
+            transform: scale(1.05);
+        }
+
+        .criteria-card .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .criteria-card .btn {
             margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="mb-4">Manage Question Criteria</h1>
+        <h1 class="mb-4 text-center">Manage Question Criteria</h1>
 
-        <!-- Form for adding criteria -->
-        <form method="POST" class="mb-4">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" name="add_criteria" class="btn btn-primary">Add Question Criteria</button>
-            <button type="submit" name="delete_all" class="btn btn-danger">Delete All</button>
-        </form>
+        <!-- List of existing criteria -->
+        <div id="criteria-list">
+            {% for criteria in criteria_list %}
+                <div class="criteria-card">
+                    <p><strong>Question Number:</strong> {{ criteria.question_number }}</p>
+                    <p><strong>Question:</strong> {{ criteria.question }}</p>
+                    <p><strong>Specific Area:</strong> {{ criteria.specific_area }}</p>
+                    <p><strong>Keywords:</strong> {{ criteria.keywords }}</p>
 
-        <!-- List of criteria -->
-        <h2>Existing Criteria</h2>
-        {% for criteria in criteria_list %}
-            <div class="criteria-card">
-                <p><strong>Question Number:</strong> {{ criteria.question_number }}</p>
-                <p><strong>Question:</strong> {{ criteria.question }}</p>
-                <p><strong>Specific Area:</strong> {{ criteria.specific_area }}</p>
-                <p><strong>Keywords:</strong> {{ criteria.keywords }}</p>
-                <form method="POST" style="display: inline;">
+                    <!-- Edit Button -->
+                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCriteriaModal-{{ criteria.id }}">Edit</button>
+
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editCriteriaModal-{{ criteria.id }}" tabindex="-1" aria-labelledby="editCriteriaModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="criteria_id" value="{{ criteria.id }}">
+                                    {{ form.as_p }}
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" name="edit_criteria" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Button -->
+                    <form method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="criteria_id" value="{{ criteria.id }}">
+                        <button type="submit" name="delete_criteria" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+            {% empty %}
+                <p>No question criteria found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Button to trigger modal for adding new question -->
+    <div class="add-btn-container">
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#addCriteriaModal"><i class="fa fa-plus"></i></button>
+    </div>
+
+    <!-- Modal for adding/editing question -->
+    <div class="modal fade" id="addCriteriaModal" tabindex="-1" aria-labelledby="addCriteriaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST">
                     {% csrf_token %}
-                    <input type="hidden" name="criteria_id" value="{{ criteria.id }}">
-                    <button type="submit" name="delete_criteria" class="btn btn-danger btn-sm">Delete</button>
+                    {{ form.as_p }}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" name="add_criteria" class="btn btn-primary">Add Question Criteria</button>
+                    </div>
                 </form>
             </div>
-        {% empty %}
-            <p>No question criteria found.</p>
-        {% endfor %}
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
- 

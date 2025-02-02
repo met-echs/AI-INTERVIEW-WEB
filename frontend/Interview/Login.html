@@ -95,7 +95,6 @@
             border-radius: 8px;
             padding-right: 1rem;
             margin-bottom: 1.5rem;
-            /* Add margin to bottom */
         }
 
         .password-container input {
@@ -122,7 +121,6 @@
             cursor: pointer;
             transition: background-color 0.3s;
             margin-top: 0.5rem;
-            /* Add margin to top */
         }
 
         .login-btn:hover {
@@ -134,16 +132,12 @@
             font-weight: bold;
             color: #2c3e50;
             text-decoration: none;
-            /* Add this line to remove underline */
         }
 
-        /* Optional: Add hover effect match */
         .logo:hover {
             color: #2c3e50;
-            /* Maintain same color on hover */
         }
 
-        /* Base style for all messages */
         .message {
             padding: 12px 20px;
             margin-top: 20px;
@@ -157,24 +151,16 @@
             transition: opacity 0.3s ease-in-out;
         }
 
-        /* Success message style */
         .message.success {
             background-color: #28a745;
             color: white;
             border: 1px solid #218838;
         }
 
-        /* Error message style */
         .message.error {
             background-color: #dc3545;
             color: white;
             border: 1px solid #c82333;
-        }
-
-        /* Optional: Add a fade-out effect */
-        .message.success,
-        .message.error {
-            opacity: 1;
         }
 
         .message.success:hover,
@@ -203,27 +189,55 @@
             <div class="input-group">
                 <!-- Render the username field -->
                 {{ form.username.errors }}
-                <input type="text" name="username" placeholder="Enter your username..."
+                <input type="text" name="username" id="username" placeholder="Enter your username..."
                     value="{{ form.username.value|default:'' }}">
             </div>
 
             <div class="password-container">
                 <!-- Render the password field -->
                 {{ form.password.errors }}
-                <input type="password" name="password" placeholder="Password"
+                <input type="password" name="password" id="password" placeholder="Password"
                     value="{{ form.password.value|default:'' }}">
                 <button type="button" class="toggle-password">Show</button>
             </div>
 
             <button type="submit" class="login-btn">Login</button>
         </form>
+
         <!-- Display any messages -->
         {% for message in messages %}
-    <p class="message {% if message.level == 'success' %}success{% endif %} {% if message.level == 'error' %}error{% endif %}">{{ message }}</p>
-{% endfor %}
+        <p class="message {% if message.level == 'success' %}success{% endif %} {% if message.level == 'error' %}error{% endif %}">{{ message }}</p>
+        {% endfor %}
     </div>
 
     <script>
+        // Function to extract query parameters from the URL
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            const pairs = queryString.split('&');
+
+            pairs.forEach(pair => {
+                const [key, value] = pair.split('=');
+                params[decodeURIComponent(key)] = decodeURIComponent(value || '');
+            });
+
+            return params;
+        }
+
+        // Populate username and password fields from URL query parameters
+        const queryParams = getQueryParams();
+        const username = queryParams.username || '';
+        const password = queryParams.password || '';
+
+        if (username) {
+            document.getElementById('username').value = username;
+        }
+        if (password) {
+            document.getElementById('password').value = password;
+        }
+
+        // Toggle password visibility
         const togglePassword = document.querySelector('.toggle-password');
         const passwordField = document.querySelector('input[type="password"]');
 

@@ -234,11 +234,23 @@
             <p>Ready to join?</p>
          </div>
 
-            <button id="joinButton"><a href="{% url 'interview' %}">Join now</a></button>
+         <button id="joinInterview">Join Now</button>
         </div>
     </div>
 
     <script>
+        const interviewId = "{{ interview_id }}";  // Ensure this is passed from Django
+
+        document.getElementById('joinInterview').addEventListener('click', function () {
+        if (interviewId) {
+            window.location.href = `/interview/interview/?interview_id=${interviewId}`; 
+        } else {
+            alert("Interview ID not found!");
+        }
+        });
+        
+        
+        
         let currentStream = null;
         let isMicOn = true;
         let isCameraOn = true;

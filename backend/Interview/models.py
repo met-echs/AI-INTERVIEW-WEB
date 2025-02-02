@@ -2,7 +2,7 @@ from django.db import models
 class Interview(models.Model):
     interview_id = models.AutoField(primary_key=True)
     candidate = models.ForeignKey("ApplyPage.Candidate", on_delete=models.CASCADE, related_name="interviews")
-    job_role = models.ForeignKey("dashboard.EvaluationCriteria", on_delete=models.CASCADE)
+    job_role = models.CharField(max_length=255)
     total_score = models.IntegerField(default=0, verbose_name="Total Interview Score")
     video_call_path = models.URLField(verbose_name="Video Call Recording Path", null=True, blank=True)
     interview_date = models.DateTimeField(auto_now_add=True)
