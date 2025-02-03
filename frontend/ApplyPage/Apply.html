@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkE2REIwIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTUtMTAtNXpNMjAgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01Ii8+PC9zdmc+">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INPACT</title>
@@ -120,7 +121,7 @@
             <input type="file" name="file" id="id_file" accept=".pdf" required onchange="handleFileChange(event)">
             <p class="file-error" id="fileError"></p>
             <p style="margin-bottom: 20px;">File format must be .pdf and less than 2MB</p>
-            <button type="submit">Apply now</button>
+            <a href="{% url 'thankyouapply' %}"><button type="submit">Apply now</button></a>
         </form>
     </div>
 

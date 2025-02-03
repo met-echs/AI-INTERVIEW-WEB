@@ -289,18 +289,24 @@ from .models import Interview, Response
 def no_questions_left(request):
     if request.method == 'POST':
         interview_id = request.session.get('interview_id')
+        candidate_id = request.session.get('candidate_id')
 
-        if not interview_id:
+        if not interview_id or not candidate_id:
             return JsonResponse({"error": "Interview ID not found in session"}, status=400)
 
         try:
             # Corrected line: use 'interview_id' instead of 'id'
             interview = Interview.objects.get(interview_id=interview_id)
-            total_score = Response.objects.filter(interview=interview).aggregate(Sum('score'))['score__sum'] or 0
-            interview.total_score = total_score
+            candidate = Candidate.objects.get(candidate_id=candidate_id)
+            resume_score=candidate.resume_score
+            interview_score = Response.objects.filter(interview=interview).aggregate(Sum('score'))['score__sum'] or 0
+            interview.total_score = interview_score
+            overall_score = resume_score+interview_score
+            candidate.overall_score = overall_score
+            candidate.save()
             interview.save()
 
-            return JsonResponse({"message": "Total score updated", "total_score": total_score})
+            return JsonResponse({"message": "Total score updated", "total_score": interview_score})
 
         except Interview.DoesNotExist:
             return JsonResponse({"error": "Interview not found"}, status=404)

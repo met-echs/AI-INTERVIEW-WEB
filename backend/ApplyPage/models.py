@@ -12,6 +12,7 @@ class Candidate(models.Model):
         verbose_name="Resume Score", 
         help_text="Score for the resume (0-100)",
     )
+    overall_score = models.IntegerField(null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     
     def __str__(self):

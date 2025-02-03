@@ -19,6 +19,9 @@ def generate_credentials(name):
     password = f"{first_name}@{current_year}"
     return password
 
+def thanku_page(request):
+    return render(request,"ApplyPage/Thankyou.html")
+
 def upload_resume(request):
     if request.method == "POST":
         name = request.POST.get('name')

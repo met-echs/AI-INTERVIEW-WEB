@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkE2REIwIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTUtMTAtNXpNMjAgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01Ii8+PC9zdmc+">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INPACT</title>
@@ -20,21 +21,36 @@
             display: flex;
             justify-content: space-between;
             padding: 25px 50px;
-            background: #f0f0f0;
+            background: #ffff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             position: relative;
             z-index: 2;
         }
 
         .logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2A6DB0;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
         }
 
         .logo:hover {
-            color: #2c3e50;
+            color: #1A4B7E;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            stroke: #2A6DB0;
+            transition: stroke 0.3s ease;
+        }
+
+        .logo:hover .logo-icon {
+            stroke: #1A4B7E;
         }
 
         .nav-links {
@@ -45,7 +61,7 @@
 
         .home-btn {
             padding: 10px 20px;
-            background: black;
+            background: #2A6DB0;
             color: white;
             border: none;
             border-radius: 5px;
@@ -82,7 +98,12 @@
 </head>
 <body>
     <nav>
-        <a href="Home.html" class="logo">INPACT</a>
+        <a href="Home.html" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            INPACT
+        </a>
         <div class="nav-links">
             <button class="home-btn" onclick="window.location.href='/'">Back to Home</button>
         </div>
