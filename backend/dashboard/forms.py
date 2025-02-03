@@ -1,7 +1,7 @@
 # forms.py
 from django import forms
 from .models import EvaluationCriteria
-from .models import Question
+from .models import Question,Admin
 
 class EvaluationCriteriaForm(forms.ModelForm):
     class Meta:
@@ -18,3 +18,7 @@ class QuestionCriteriaForm(forms.ModelForm):
             'specific_area': forms.TextInput(attrs={'class': 'form-control'}),
             'keywords': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=150, required=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=True)

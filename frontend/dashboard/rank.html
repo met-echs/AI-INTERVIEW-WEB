@@ -1,0 +1,386 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview Dashboard - Candidates</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkE2REIwIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTUtMTAtNXpNMjAgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01Ii8+PC9zdmc+">
+    <style>
+        /* Existing styles from previous code */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffff;
+            min-height: 100vh;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2A6DB0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .logo:hover {
+            color: #1A4B7E;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            stroke: #2A6DB0;
+            transition: stroke 0.3s ease;
+        }
+
+        .logo:hover .logo-icon {
+            stroke: #1A4B7E;
+        }
+        .company-name {
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+
+        .dashboard-container {
+            display: flex;
+            margin-top: 64px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            padding: 1rem;
+            position: fixed;
+            height: calc(100vh - 64px);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            left: 260px;
+            top: 82px;
+            background: #3498db;
+            padding: 3px 12px;
+            border: none;
+            border-radius: 5px 5px 5px 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-toggle.collapsed {
+            left: 1rem;
+            transform: rotate(180deg);
+        }
+
+        .sidebar-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .sidebar-link {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            color: #2c3e50;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link.active,
+        .sidebar-link:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            margin-left: 250px;
+            transition: margin 0.3s ease;
+        }
+
+        /* Candidate Page Specific Styles */
+        .candidates-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .refresh-btn {
+            background: #2A6DB0;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #3498db;
+        }
+
+        .candidates-grid {
+            display: flex;
+            gap: 1.5rem;
+            flex-direction: column;
+        }
+
+        .candidate-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .candidate-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .candidate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .candidate-status {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .status-pending {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .candidate-details p {
+            margin: 0.5rem 0;
+            color: #64748b;
+        }
+
+        .candidate-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn {
+            background: #2A6DB0;
+            color: white;
+        }
+
+        .evaluate-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .download-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .candidates-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            INPACT
+        </a>
+        <span class="company-name">TechCorp AI Interviews</span>
+    </nav>
+
+    <button class="sidebar-toggle" id="sidebarToggle">❮</button>
+
+    <div class="dashboard-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-links">
+                <a href="{% url 'high_scores' %}" class="sidebar-link active" onclick="showPage('candidates')">Candidates</a>
+                <a href="{% url 'manage_evaluation_criteria' %}" class="sidebar-link" onclick="showPage('evaluation')">Evaluation</a>
+                <a href="{% url 'question_manage_criteria' %}" class="sidebar-link" onclick="showPage('questions')">Questions</a>
+            </div>
+        </aside>
+
+        <main class="main-content" id="mainContent">
+            <div class="candidates-page">
+                <div class="candidates-header">
+                    <h1>Candidates</h1>
+                    <button class="refresh-btn" onclick="refreshCandidates()">Refresh List</button>
+                </div>
+                
+                <div class="candidates-grid" id="candidatesList">
+                    <!-- Candidate cards will be dynamically inserted here -->
+                <!-- </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('collapsed');
+            toggleBtn.classList.toggle('collapsed');
+            
+            mainContent.style.marginLeft = sidebar.classList.contains('collapsed') ? '0' : '250px';
+        }
+
+        document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+
+        // Page Navigation
+        function showPage(pageId) {
+            // Implementation for multi-page navigation
+        }
+
+        // Candidate Data
+        const mockCandidates = [
+            {
+                id: 1,
+                name: "Sarah Johnson",
+                position: "Senior Developer",
+                experience: "8 years",
+                status: "pending",
+                lastUpdated: "2023-12-15",
+                resume: "#"
+            },
+            {
+                id: 2,
+                name: "Michael Chen",
+                position: "Data Scientist",
+                experience: "5 years",
+                status: "completed",
+                lastUpdated: "2023-12-14",
+                resume: "#"
+            },
+            {
+                id: 3,
+                name: "Emma Wilson",
+                position: "UX Designer",
+                experience: "6 years",
+                status: "pending",
+                lastUpdated: "2023-12-13",
+                resume: "#"
+            }
+        ];
+
+        // Render Candidates
+        function renderCandidates(candidates) {
+            const container = document.getElementById('candidatesList');
+            container.innerHTML = '';
+
+            candidates.forEach(candidate => {
+                const card = document.createElement('div');
+                card.className = 'candidate-card';
+                card.innerHTML = `
+                    <div class="candidate-header">
+                        <h3>${candidate.name}</h3>
+                        <span class="candidate-status ${candidate.status === 'pending' ? 'status-pending' : 'status-completed'}">
+                            ${candidate.status.charAt(0).toUpperCase() + candidate.status.slice(1)}
+                        </span>
+                    </div>
+                    <div class="candidate-details">
+                        <p><strong>Position:</strong> ${candidate.position}</p>
+                        <p><strong>Experience:</strong> ${candidate.experience}</p>
+                        <p><strong>Last Updated:</strong> ${candidate.lastUpdated}</p>
+                    </div>
+                    <div class="candidate-actions">
+                        <button class="action-btn view-btn" onclick="viewCandidate(${candidate.id})">View</button>
+                        <button class="action-btn evaluate-btn" onclick="evaluateCandidate(${candidate.id})">Evaluate</button>
+                        <button class="action-btn download-btn" onclick="downloadResume('${candidate.resume}')">Download</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Candidate Actions
+        function viewCandidate(id) {
+            alert(Viewing candidate #${id});
+        }
+
+        function evaluateCandidate(id) {
+            alert(Evaluating candidate #${id});
+        }
+
+        function downloadResume(url) {
+            alert(Downloading resume from ${url});
+        }
+
+        function refreshCandidates() {
+            const container = document.getElementById('candidatesList');
+            container.innerHTML = '<div class="loading">Refreshing candidates...</div>';
+            
+            setTimeout(() => {
+                renderCandidates(mockCandidates);
+            }, 1000);
+        }
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCandidates(mockCandidates);
+        });
+    </script>
+</body>
+</html> --> -->

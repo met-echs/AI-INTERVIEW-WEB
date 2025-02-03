@@ -18,3 +18,7 @@ class Question(models.Model):
     
     def __str__(self):
         return self.question_text
+
+class Admin(models.Model):
+    username = models.EmailField(unique=True, verbose_name="Email Address")
+    password = models.CharField(max_length=255, verbose_name="Password")

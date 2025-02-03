@@ -34,7 +34,7 @@ def manage_evaluation_criteria(request):
     evaluation_criteria = EvaluationCriteria.objects.all()
 
     # Return both the form and the evaluation criteria to the template
-    return render(request, 'evaluation_criteria_manage.html', {
+    return render(request, 'dashboard/evaluation_criteria_manage.html', {
         'form': form,
         'evaluation_criteria': evaluation_criteria
     })
@@ -72,7 +72,7 @@ def question_manage_criteria(request):
     # Get all questions ordered by question_number
     criteria_list = Question.objects.all().order_by('question_number')
 
-    return render(request, 'question_criteria_manage.html', {
+    return render(request, 'dashboard/question_criteria_manage.html', {
         'form': form,
         'criteria_list': criteria_list
     })
@@ -83,7 +83,30 @@ def question_detail(request, question_id):
 
 def high_scores(request):
     # Get all candidates ordered by resume_score in descending order
-    candidates = Candidate.objects.all().order_by('-resume_score')
+    candidates = Candidate.objects.all().order_by('overall_score')
 
     # Pass the candidate data to the template
-    return render(request, 'rank.html', {'candidates': candidates})
+    return render(request, 'dashboard/rank.html', {'candidates': candidates})
+
+from .forms import LoginForm
+
+from .models import Admin
+def login_page(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            try:
+                admin = Admin.objects.get(email=username, password=password)
+                # Store user ID in session
+                messages.success(request, "Login successful!")
+                return render(request, 'dashboard/rank.html')
+            except Candidate.DoesNotExist:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid form data.")
+        return redirect('login')  # Redirect to avoid resubmission
+    else:
+        form = LoginForm()
+    return render(request, 'dashboard/Login.html', {'form': form})
