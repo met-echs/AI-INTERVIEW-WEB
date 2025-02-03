@@ -26,7 +26,12 @@ def index(request):
     # Get the interview_id from the GET parameters
     interview_id = request.GET.get("interview_id")
     # You can also validate this if needed.
-    return render(request, 'interview/interview_start.html', {"interview_id": interview_id})
+    return render(request, 'interview/videocall.html', {"interview_id": interview_id})
+
+def endinterview(request):
+    user_name = request.session.get('candidate_name', 'Guest') 
+    return render(request, 'interview/ExitPage.html', {"name": user_name})
+
 
 @csrf_exempt
 def join_interview(request):
@@ -72,7 +77,6 @@ def interview_test(request):
     interview_id = request.GET.get('interview_id')
     print(f"interview_id:{interview_id}")
     return render(request, 'interview/interview_test.html', {"interview_id": interview_id})
-
 @csrf_exempt
 def login_view(request):
     if request.method == 'POST':
@@ -83,6 +87,7 @@ def login_view(request):
             try:
                 user = Candidate.objects.get(email=username, password=password)
                 # Store user ID in session
+                request.session['candidate_name'] = user.name
                 request.session['candidate_id'] = user.pk
                 messages.success(request, "Login successful!")
                 return render(request, 'interview/interview_home.html', {'name': user.name})
@@ -148,6 +153,7 @@ def get_question(request):
             question_number = int(question_number)
             question = Question.objects.get(question_number=question_number)
         except (Question.DoesNotExist, ValueError):
+            print("QUESTION FINSISHED")
             return JsonResponse({
                 "error": "Okay, the questions are finished. You can exit the interview.",
                 "status": "finished"
@@ -156,6 +162,7 @@ def get_question(request):
         # Fetch the first question based on the smallest question_number
         question = Question.objects.order_by('question_number').first()
         if not question:
+            print("QUESTION FINSISHED")
             return JsonResponse({
                 "error": "Okay, the questions are finished. You can exit the interview.",
                 "status": "finished"
@@ -273,3 +280,32 @@ def live_transcribe(request):
             return JsonResponse({"error": f"Microphone error: {e}"})
     else:
         return JsonResponse({"error": "Transcription is not active"})
+
+
+from django.http import JsonResponse
+from django.db.models import Sum
+from .models import Interview, Response
+
+def no_questions_left(request):
+    if request.method == 'POST':
+        interview_id = request.session.get('interview_id')
+
+        if not interview_id:
+            return JsonResponse({"error": "Interview ID not found in session"}, status=400)
+
+        try:
+            # Corrected line: use 'interview_id' instead of 'id'
+            interview = Interview.objects.get(interview_id=interview_id)
+            total_score = Response.objects.filter(interview=interview).aggregate(Sum('score'))['score__sum'] or 0
+            interview.total_score = total_score
+            interview.save()
+
+            return JsonResponse({"message": "Total score updated", "total_score": total_score})
+
+        except Interview.DoesNotExist:
+            return JsonResponse({"error": "Interview not found"}, status=404)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+

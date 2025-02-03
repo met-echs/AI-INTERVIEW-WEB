@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INPACT</title>
+    <title>Thank You - INPACT</title>
     <style>
         * {
             margin: 0;
@@ -28,6 +28,7 @@
             top: 0;
             z-index: 1000;
         }
+
         .logo {
             font-size: 1.5rem;
             font-weight: 700;
@@ -96,8 +97,19 @@
         ul li:hover {
             transform: translateX(8px);
         }
-    
-        .start-button {
+
+        .checkmark-icon {
+            width: 64px;
+            height: 64px;
+            margin: 2rem 0;
+            stroke: #2A6DB0;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .home-button {
             background: linear-gradient(135deg, #2A6DB0 0%, #1A4B7E 100%);
             color: white;
             padding: 1rem 2.5rem;
@@ -110,19 +122,12 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(42, 109, 176, 0.2);
         }
-    
-        .start-button:hover {
+
+        .home-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(42, 109, 176, 0.3);
         }
-    
-        .lighter-text {
-            color: #718096;
-            margin-top: 1.5rem;
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-    
+
         @media (max-width: 768px) {
             .interview-container {
                 padding: 1.5rem;
@@ -145,7 +150,7 @@
 </head>
 <body>
     <nav>
-        <a href="{% url 'home' %}" class="logo">
+        <a href="Home.html" class="logo">
             <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
             </svg>
@@ -155,26 +160,31 @@
     </nav>
 
     <div class="interview-container">
-        <h1>Welcome to your AI Interview</h1>
-        <p>Hello <strong>{{ name }},</strong></p>
-        <p>We’re excited to have you here! Before starting, please review the following guidelines:</p>
+        <svg class="checkmark-icon" viewBox="0 0 24 24">
+            <path d="M20 6L9 17l-5-5"/>
+        </svg>
+        <h1>Thank You for Your Participation!</h1>
+        <p>Dear <strong>{{ name }},</strong></p>
+        <p>Your interview has been successfully submitted. Here's what happens next:</p>
+        
         <ul>
-            <li>Allow access to your microphone and camera.</li>
-            <li>This session will be recorded.</li>
-            <li>This is a one-time interview, so ensure you are ready.</li>
-            <li>Find a quiet, well-lit place with a stable internet connection.</li>
-            <li>The session will take approximately 15-20 minutes.</li>
-            <li>The response of the questions recoded by switching on/off the second mic button.</li>
+            <li>Your interview recording will be reviewed by our team</li>
+            <li>Final results will be sent to your registered email within 3-5 business days</li>
+            <li>You'll receive detailed feedback along with the results</li>
+            <li>Check your spam folder if you don't see our email</li>
         </ul>
-        <a href="{% url 'join' %}"><button class="start-button" onclick="handleStartInterview()">
-            Start Interview
-        </button></a>
-        <p class="lighter-text">By clicking Start, you agree to our privacy and recording policies.</p>
+
+        <p>We appreciate you taking the time to interview with us using INPACT.</p>
+        
+        <button class="home-button" onclick="returnToHome()">
+            Return to Home
+        </button>
     </div>
 
     <script>
-        var interviewId = "{{ interview_id }}"; // Pass from Django to JavaScript
-        sessionStorage.setItem("interview_id", interviewId); // Store for later use
+        function returnToHome() {
+            window.location.href = "{% url 'home' %}";
+        }
     </script>
 </body>
 </html>
