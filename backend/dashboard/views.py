@@ -6,6 +6,7 @@ from .forms import EvaluationCriteriaForm
 from .models import Question
 from .forms import QuestionCriteriaForm
 
+
 def manage_evaluation_criteria(request):
     if request.method == 'POST':
         if 'add_criteria' in request.POST:
@@ -39,6 +40,8 @@ def manage_evaluation_criteria(request):
         'evaluation_criteria': evaluation_criteria
     })
 
+from django.http import JsonResponse
+
 def question_manage_criteria(request):
     if request.method == 'POST':
         if 'add_criteria' in request.POST:
@@ -49,6 +52,7 @@ def question_manage_criteria(request):
                 return redirect('question_manage_criteria')
             else:
                 messages.error(request, 'Failed to add question criteria. Please check the form.')
+
         elif 'delete_criteria' in request.POST:
             criteria_id = request.POST.get('criteria_id')
             criteria = get_object_or_404(Question, id=criteria_id)
@@ -63,14 +67,28 @@ def question_manage_criteria(request):
             else:
                 messages.info(request, 'No next question available.')
                 return redirect('question_manage_criteria')
-        elif 'delete_all' in request.POST:  
+            
+            
+                
+        elif 'edit_criteria' in request.POST:
+            criteria_id = request.POST.get('criteria_id')
+            criteria = get_object_or_404(Question, id=criteria_id)
+            form = QuestionCriteriaForm(request.POST, instance=criteria)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Question criteria updated successfully!')
+                return redirect('question_manage_criteria')
+            else:
+                messages.error(request, 'Failed to update question criteria. Please check the form.')
+
+        elif 'delete_all' in request.POST:
             Question.objects.all().delete()
             messages.success(request, 'All question criteria deleted successfully!')
             return redirect('question_manage_criteria')
+
     else:
         form = QuestionCriteriaForm()
 
-    # Get all questions ordered by question_number
     criteria_list = Question.objects.all().order_by('question_number')
 
     return render(request, 'question_criteria_manage.html', {

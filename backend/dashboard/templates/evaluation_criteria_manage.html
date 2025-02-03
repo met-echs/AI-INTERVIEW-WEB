@@ -6,92 +6,150 @@
     <title>Manage Evaluation Criteria</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <style>
-        body {
-            padding: 20px;
-            background-color: #f8f9fa;
+        :root {
+            --primary-color: #2a4d7a;
+            --secondary-color: #5b7ca3;
+            --accent-color: #e9ecef;
         }
 
-        .card {
-            border: none;
+        body {
+            background-color: #fffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .page-header h1 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .criteria-card {
+            background: white;
+            border-left: 4px solid var(--primary-color);
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .criteria-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .criteria-detail {
+            color: #495057;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .criteria-detail strong {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            padding: 0.75rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(43, 77, 122, 0.1);
         }
 
         .btn-primary {
-            background-color: #007bff;
+            background-color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
             border: none;
         }
 
         .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border: none;
-        }
-
-        .btn-danger:hover {
-            background-color: #b02a37;
+            background-color: #1a3657;
         }
 
         .btn-warning {
-            background-color: #ffc107;
-            border: none;
-            color: black;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
         }
 
         .btn-warning:hover {
-            background-color: #d39e00;
+            background-color: #465d7a;
+            color: white;
         }
 
-        .modal-content {
+        .empty-state {
+            background: white;
             border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        .hide {
-            display: none;
+        .empty-state p {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin: 1rem 0;
         }
 
-        .full-height {
-            min-height: 70vh;
+        .modal-header {
+            border-bottom: 2px solid var(--accent-color);
         }
 
-        .criteria-card {
-            margin-bottom: 20px;
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+        .modal-title {
+            color: var(--primary-color);
+            font-weight: 600;
         }
 
-        .criteria-card .criteria-title {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .criteria-card .criteria-detail {
-            font-size: 18px;
-            margin-top: 10px;
-        }
-
-        .criteria-card .btn-group {
-            margin-top: 15px;
-        }
-
-        .criteria-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .delete-all-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--accent-color);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="mb-4">Manage Evaluation Criteria</h1>
+        <header class="page-header">
+            <h1>Evaluation Criteria Management</h1>
+        </header>
 
-        <!-- Display success or error messages -->
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -101,81 +159,143 @@
             {% endfor %}
         {% endif %}
 
-        <!-- Form to add new Evaluation Criteria (Hidden when at least one criterion exists) -->
-        <div class="card p-3 {% if evaluation_criteria %}hide{% endif %}" id="criteriaForm">
-            <h4>Add New Evaluation Criteria</h4>
+        <!-- Add Criteria Section -->
+        <div class="form-section {% if evaluation_criteria %}d-none{% endif %}">
+            <h3 class="card-title mb-4">Create New Evaluation Criteria</h3>
             <form method="POST" action="{% url 'manage_evaluation_criteria' %}">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" name="add_criteria" class="btn btn-primary mt-3">Add Criteria</button>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Job Role</label>
+                        {{ form.job_role }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Minimum Experience (Years)</label>
+                        {{ form.min_years_experience }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Minimum Projects</label>
+                        {{ form.min_projects }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Required Certifications</label>
+                        {{ form.certifications_required }}
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" name="add_criteria" class="btn btn-primary mt-3">
+                            Create Criteria
+                        </button>
+                    </div>
+                </div>
             </form>
         </div>
 
-        <!-- Full-page display for each Evaluation Criterion -->
-        <div class="criteria-container {% if evaluation_criteria %}full-height{% endif %}">
+        <!-- Criteria List -->
+        <div class="criteria-list">
             {% if evaluation_criteria %}
-                {% for criteria in evaluation_criteria %}
-                    <div class="criteria-card">
-                        <div class="criteria-title">{{ criteria.job_role }}</div>
-                        <div class="criteria-detail">
-                            <strong>Experience (Years):</strong> {{ criteria.min_years_experience }}<br>
-                            <strong>Projects:</strong> {{ criteria.min_projects }}<br>
-                            <strong>Certifications:</strong> {{ criteria.certifications_required }}
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ criteria.id }}">
-                                Edit
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Edit Modal -->
-                    <div class="modal fade" id="editModal{{ criteria.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ criteria.id }}" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="editModalLabel{{ criteria.id }}">Edit Criteria</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form method="POST" action="{% url 'manage_evaluation_criteria' %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="criteria_id" value="{{ criteria.id }}">
-                                        <div class="mb-3">
-                                            <label class="form-label">Job Role</label>
-                                            <input type="text" class="form-control" name="job_role" value="{{ criteria.job_role }}" required>
+                <div class="row g-4">
+                    {% for criteria in evaluation_criteria %}
+                        <div class="col-12">
+                            <div class="criteria-card p-4">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h3 class="card-title">{{ criteria.job_role }}</h3>
+                                        <div class="criteria-detail">
+                                            <strong>Experience:</strong> {{ criteria.min_years_experience }} years<br>
+                                            <strong>Projects Required:</strong> {{ criteria.min_projects }}<br>
+                                            <strong>Certifications:</strong> {{ criteria.certifications_required }}
                                         </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Experience (Years)</label>
-                                            <input type="number" class="form-control" name="min_years_experience" value="{{ criteria.min_years_experience }}" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Projects</label>
-                                            <input type="number" class="form-control" name="min_projects" value="{{ criteria.min_projects }}" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Certifications</label>
-                                            <input type="text" class="form-control" name="certifications_required" value="{{ criteria.certifications_required }}" required>
-                                        </div>
-                                        <button type="submit" name="update_criteria" class="btn btn-primary">Update Criteria</button>
-                                    </form>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ criteria.id }}">
+                                            Edit Criteria
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editModal{{ criteria.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ criteria.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Edit Criteria - {{ criteria.job_role }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" action="{% url 'manage_evaluation_criteria' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="criteria_id" value="{{ criteria.id }}">
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Job Role</label>
+                                                    <input type="text" class="form-control" name="job_role" value="{{ criteria.job_role }}" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Experience (Years)</label>
+                                                    <input type="number" class="form-control" name="min_years_experience" value="{{ criteria.min_years_experience }}" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Projects</label>
+                                                    <input type="number" class="form-control" name="min_projects" value="{{ criteria.min_projects }}" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Certifications</label>
+                                                    <input type="text" class="form-control" name="certifications_required" value="{{ criteria.certifications_required }}" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer mt-4">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" name="update_criteria" class="btn btn-primary">Save Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             {% else %}
-                <p class="text-muted">No evaluation criteria found.</p>
+                <div class="empty-state">
+                    <h3 class="card-title">No Evaluation Criteria Found</h3>
+                    <p>Start by creating your first set of evaluation criteria using the form above.</p>
+                </div>
             {% endif %}
         </div>
 
-        <!-- Button to delete all Evaluation Criteria -->
+        {% comment %} <!-- Delete All Section -->
         {% if evaluation_criteria %}
-            <form method="POST" action="{% url 'manage_evaluation_criteria' %}" class="text-end">
-                {% csrf_token %}
-                <button type="submit" name="delete_all" class="btn btn-danger">Delete All Entries</button>
-            </form>
-        {% endif %}
+            <div class="delete-all-section">
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+                        Delete All Criteria
+                    </button>
+                </div>
+            </div>
+
+            <!-- Delete All Modal -->
+            <div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirm Deletion</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="lead">Are you sure you want to delete all evaluation criteria? This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <form method="POST" action="{% url 'manage_evaluation_criteria' %}">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" name="delete_all" class="btn btn-danger">Confirm Delete All</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %} {% endcomment %}
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

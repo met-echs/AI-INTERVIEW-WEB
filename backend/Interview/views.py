@@ -47,7 +47,7 @@ def login_view(request):
     else:
         form = LoginForm()
     
-    return render(request, 'interview/Login.html', {'form': form})
+    return render(request, 'Interview/Login.html', {'form': form})
 
 def evaluate_answer(question_text, response_text, specific_area, keywords):
     print("evaluate_answer")
