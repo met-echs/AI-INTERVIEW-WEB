@@ -15,7 +15,7 @@
         }
 
         body {
-            background-color: #f5f6fa;
+            background-color: #ffffff;
         }
 
         nav {
@@ -23,15 +23,34 @@
             justify-content: space-between;
             align-items: center;
             padding: 1.5rem 4rem;
-            background: #f0f0f0;
+            background: #ffffff;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2A6DB0;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .logo:hover {
+            color: #1A4B7E;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            stroke: #2A6DB0;
+            transition: stroke 0.3s ease;
+        }
+
+        .logo:hover .logo-icon {
+            stroke: #1A4B7E;
         }
 
         .nav-links {
@@ -128,15 +147,13 @@
             background-color: #2980b9;
         }
 
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2c3e50;
-            text-decoration: none;
-        }
-
-        .logo:hover {
-            color: #2c3e50;
+        .admin-login {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #7f8c8d;
+            font-weight: 500;
+            transition: color 0.3s;
         }
 
         .message {
@@ -173,7 +190,12 @@
 
 <body>
     <nav>
-        <a href="{% url 'home' %}" class="logo">INPAT</a>
+        <a href="{% url 'home' %}" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            INPACT
+        </a>
         <div class="nav-links">
             <a href="{% url 'apply' %}">Apply</a>
             <a href="{% url 'login' %}">Login</a>
@@ -205,7 +227,7 @@
             <button type="submit" class="login-btn">Login</button>
         </form>
 
-        <a href="{% url 'admin_login' %}" style="text-align: center;">admin login</a>
+        <a href="{% url 'admin_login' %}" class="admin-login">Admin login</a>
     </div>
 
     <script>

@@ -31,15 +31,29 @@
         }
 
         .logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2c3e50;
-            text-decoration: none; /* Add this line to remove underline */
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2A6DB0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
         }
-        
-        /* Optional: Add hover effect match */
+
         .logo:hover {
-            color: #2c3e50; /* Maintain same color on hover */
+            color: #1A4B7E;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            stroke: #2A6DB0;
+            transition: stroke 0.3s ease;
+        }
+
+        .logo:hover .logo-icon {
+            stroke: #1A4B7E;
         }
 
         .nav-links {
@@ -104,7 +118,12 @@
 </head>
 <body>
     <nav>
-        <a href="{% url 'home' %}" class="logo">INPAT</a>
+        <a href="{% url 'home' %}" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            INPACT
+        </a>
         <div class="nav-links">
             <a href="{% url 'apply' %}">Apply</a>
             <a href="{% url 'login' %}">Login</a>
