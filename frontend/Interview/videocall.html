@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Recorder</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f0f2f5;
+            position: relative;
+        }
+
+        .video-container {
+            position: relative;
+            width: 70%;
+            max-width: 950px;
+        }
+
+        #localVideo {
+            width: 100%;
+            border-radius: 10px;
+            background: #000;
+            transform: scaleX(-1);
+            display: block;
+        }
+
+        .controls {
+            margin: 25px 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .button {
+            width: 56px;
+            height: 56px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3em;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .mic-btn {
+            background: #3cba54;
+        }
+
+        .camera-btn {
+            background: #4285f4;
+        }
+
+        .flip-btn {
+            background: #737373;
+        }
+
+        .end-call {
+            background: #db4437;
+        }
+
+        .response-mic-btn {
+            background: #9c27b0;
+        }
+
+        .text-field {
+            position: absolute;
+            top: 68%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 25px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            max-width: 80%;
+            width: fit-content;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 1.1em;
+            line-height: 1.4;
+            z-index: 1;
+            white-space: pre-wrap;
+            word-break: break-word;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .volume-indicator {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.5rem 0.75rem;
+            border-radius: 2rem;
+            backdrop-filter: blur(4px);
+            z-index: 2;
+            padding-left: 20px;
+        }
+
+        .volume-bar {
+            width: 4px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            transition: all 0.1s ease;
+        }
+
+        .volume-bar.active {
+            background: #4ade80;
+        }
+
+        .active {
+            background-color: red;
+            /* Change button color when active */
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="video-container">
+            <video id="localVideo" autoplay muted></video>
+            <div class="volume-indicator" id="volumeIndicator">
+                <div class="volume-bar"></div>
+                <div class="volume-bar"></div>
+                <div class="volume-bar"></div>
+                <div class="volume-bar"></div>
+                <div class="volume-bar"></div>
+            </div>
+        </div>
+        <div class="controls">
+            <button class="button mic-btn" id="micButton">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="button camera-btn" id="cameraButton">
+                <i class="fas fa-video"></i>
+            </button>
+            <button class="button flip-btn" id="flipButton">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+            <button class="button response-mic-btn" id="responseMicButton">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="button end-call" id="endCall">
+                <i class="fas fa-phone-slash"></i>
+            </button>
+        </div>
+        <div class="text-field" id="questionField">
+            <!-- Question will be populated here -->
+        </div>
+    </div>
+
+    <script>
+        function setupAudioAnalyzer(stream) {
+            if (audioContext) return;
+
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+            updateVolumeIndicator();
+        }
+
+        function updateVolumeIndicator() {
+            if (!analyser) return;
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+            let average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            average = Math.min(Math.max(average, 0), 100);
+
+            document.querySelectorAll('.volume-bar').forEach((bar, index) => {
+                bar.classList.toggle('active', index < Math.ceil((average / 100) * 5));
+            });
+            requestAnimationFrame(updateVolumeIndicator);
+        }
+
+
+
+        document.getElementById("responseMicButton").addEventListener("click", function () {
+            toggleTranscription();
+            updateButtonUI();
+        });
+
+        function toggleTranscription() {
+            isTranscribing = !isTranscribing;
+            if (isTranscribing) {
+                startTranscription();
+            } else {
+                stopTranscription();
+            }
+        }
+
+        function updateButtonUI() {
+            const button = document.getElementById("responseMicButton");
+            if (isTranscribing) {
+                button.classList.add("active"); // Add an 'active' class when transcribing
+                button.innerHTML = '<i class="fas fa-microphone-slash"></i>'; // Change icon
+            } else {
+                button.classList.remove("active");
+                button.innerHTML = '<i class="fas fa-microphone"></i>'; // Reset icon
+            }
+        }
+
+        function startTranscription() {
+            console.log("Transcription started...");
+            // Add transcription start logic here
+        }
+
+        function stopTranscription() {
+            console.log("Transcription stopped...");
+            // Add transcription stop logic here
+        }
+
+
+        let mediaStream = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isMicOn = true;
+        let isCameraOn = true;
+        let videoDevices = [];
+        let currentDeviceIndex = 0;
+        let audioContext = null, analyser = null, microphone = null;
+
+        // Response recording variables
+        let responseRecorder = null;
+        let responseRecordedChunks = [];
+        let isResponseMicOn = false;
+
+        const mimeTypeOptions = [
+            'video/webm;codecs=vp9,opus',
+            'video/webm;codecs=vp8,opus',
+            'video/webm'
+        ];
+
+        function setupAudioAnalyzer(stream) {
+            if (audioContext) return;
+
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+            updateVolumeIndicator();
+        }
+
+        function updateVolumeIndicator() {
+            if (!analyser) return;
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+            let average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            average = Math.min(Math.max(average, 0), 100);
+
+            document.querySelectorAll('.volume-bar').forEach((bar, index) => {
+                bar.classList.toggle('active', index < Math.ceil((average / 100) * 5));
+            });
+            requestAnimationFrame(updateVolumeIndicator);
+        }
+
+        async function initializeMedia() {
+            try {
+                // Get initial media
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: true
+                });
+
+                setupAudioAnalyzer(mediaStream);
+
+                // Get available video devices
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                videoDevices = devices.filter(d => d.kind === 'videoinput');
+                currentDeviceIndex = videoDevices.findIndex(device =>
+                    device.deviceId === mediaStream.getVideoTracks()[0].getSettings().deviceId);
+
+                const videoElement = document.getElementById('localVideo');
+                videoElement.srcObject = mediaStream;
+
+                const supportedMimeType = mimeTypeOptions.find(type =>
+                    MediaRecorder.isTypeSupported(type)) || 'video/webm';
+
+                mediaRecorder = new MediaRecorder(mediaStream, {
+                    mimeType: supportedMimeType,
+                    audioBitsPerSecond: 128000,
+                    videoBitsPerSecond: 2500000
+                });
+
+                setupMediaRecorderHandlers();
+                mediaRecorder.start(1000);
+
+            } catch (error) {
+                alert('Camera and microphone access required!');
+            }
+        }
+
+        function setupMediaRecorderHandlers() {
+            mediaRecorder.ondataavailable = event => {
+                if (event.data.size > 0) recordedChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `recording-${Date.now()}.webm`;
+                document.body.appendChild(a);
+                a.click();
+
+                setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    recordedChunks = [];
+                    window.location.href = "{% url 'thankyouinterview' %}";
+                }, 100);
+            };
+        }
+
+        async function flipCamera() {
+            if (videoDevices.length < 2) return;
+
+            try {
+                mediaStream.getTracks().forEach(track => track.stop());
+                currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
+
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        deviceId: { exact: videoDevices[currentDeviceIndex].deviceId },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: true
+                });
+
+                setupAudioAnalyzer(mediaStream);
+                const videoElement = document.getElementById('localVideo');
+                videoElement.srcObject = mediaStream;
+                mediaStream.getVideoTracks()[0].enabled = isCameraOn;
+
+                if (mediaRecorder?.state === 'recording') {
+                    mediaRecorder.stop();
+                    const supportedMimeType = mimeTypeOptions.find(type =>
+                        MediaRecorder.isTypeSupported(type)) || 'video/webm';
+
+                    mediaRecorder = new MediaRecorder(mediaStream, {
+                        mimeType: supportedMimeType,
+                        audioBitsPerSecond: 128000,
+                        videoBitsPerSecond: 2500000
+                    });
+
+                    mediaRecorder.start(1000);
+                    setupMediaRecorderHandlers();
+                }
+
+            } catch (error) {
+                console.error('Error flipping camera:', error);
+            }
+        }
+
+        function toggleMic() {
+            isMicOn = !isMicOn;
+            mediaStream.getAudioTracks().forEach(track => track.enabled = isMicOn);
+            document.getElementById('micButton').innerHTML =
+                `<i class="fas fa-microphone${isMicOn ? '' : '-slash'}"></i>`;
+        }
+
+        function toggleCamera() {
+            isCameraOn = !isCameraOn;
+            mediaStream.getVideoTracks().forEach(track => track.enabled = isCameraOn);
+            document.getElementById('cameraButton').innerHTML =
+                `<i class="fas fa-video${isCameraOn ? '' : '-slash'}"></i>`;
+        }
+
+        function toggleResponseRecording() {
+            isResponseMicOn = !isResponseMicOn;
+            const button = document.getElementById('responseMicButton');
+
+            if (isResponseMicOn) {
+                // Start response recording
+                responseRecordedChunks = [];
+                const audioStream = new MediaStream(mediaStream.getAudioTracks());
+                responseRecorder = new MediaRecorder(audioStream);
+
+                responseRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) responseRecordedChunks.push(event.data);
+                };
+
+                responseRecorder.onstop = () => {
+                    const blob = new Blob(responseRecordedChunks, { type: 'audio/webm' });
+                    // Handle the recorded response here (e.g., upload or save)
+                    console.log('Response recording saved', blob);
+                };
+
+                responseRecorder.start();
+                button.innerHTML = '<i class="fas fa-microphone"></i>';
+            } else {
+                // Stop response recording
+                if (responseRecorder && responseRecorder.state === 'recording') {
+                    responseRecorder.stop();
+                }
+                button.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+            }
+        }
+
+        function endCall() {
+            let wasRecording = false;
+            if (mediaRecorder?.state === 'recording') {
+                mediaRecorder.stop();
+                wasRecording = true;
+            }
+            mediaStream?.getTracks().forEach(track => track.stop());
+
+            if (!wasRecording) {
+                setTimeout(() => {
+                    window.location.href = "{% url 'thankyouinterview' %}";
+                }, 100);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('micButton').addEventListener('click', toggleMic);
+        document.getElementById('cameraButton').addEventListener('click', toggleCamera);
+        document.getElementById('flipButton').addEventListener('click', flipCamera);
+        document.getElementById('responseMicButton').addEventListener('click', toggleResponseRecording);
+        document.getElementById('endCall').addEventListener('click', endCall);
+
+        // Initialize
+        window.addEventListener('load', initializeMedia);
+
+        // Example question update (replace with actual data from backend)
+        // document.getElementById('questionField').textContent = 
+        //     "This is a sample question that can be very long. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+
+
+        let currentQuestionNumber = null; // Initialize with no question number
+        let isTranscribing = false;
+
+        // Toggle transcription on/off
+        function toggleTranscription() {
+            isTranscribing = !isTranscribing;
+            if (isTranscribing) {
+                startTranscription();
+            } else {
+                stopTranscription();
+            }
+        }
+
+        // Start transcription for the current question
+        function startTranscription() {
+            if (currentQuestionNumber === null) {
+                console.error("No question available for transcription.");
+                return;
+            }
+
+            fetch(`/interview/start_transcription/?question_number=${currentQuestionNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    // document.getElementById('result').innerText = data.status;
+                    console.log("Hello")
+                    fetchTranscription();
+                })
+                .catch(error => {
+                    console.error('Error starting transcription:', error);
+                    // document.getElementById('result').innerText = "Error starting transcription.";
+                });
+        }
+
+        // Stop transcription for the current question
+        function stopTranscription() {
+            if (currentQuestionNumber === null) {
+                console.error("No question available to stop transcription.");
+                return;
+            }
+
+            fetch(`/interview/stop_transcription/?question_number=${currentQuestionNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.response && data.score !== undefined) {
+                        console.log("h")
+                        // document.getElementById('result').innerText = `Response: ${data.response}\nScore: ${data.score}`;
+                    } else {
+                        console.log("H")
+                        // document.getElementById('result').innerText = "Error with transcription data.";
+                    }
+                    nextQuestion();  // Automatically move to the next question
+                })
+                .catch(error => {
+                    console.error('Error stopping transcription:', error);
+                    // document.getElementById('result').innerText = "Error stopping transcription.";
+                });
+        }
+
+        // Fetch live transcription updates
+        function fetchTranscription() {
+            if (isTranscribing) {
+                fetch('/interview/live_transcribe/')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.transcription) {
+                            console.log("f")
+                            // document.getElementById('result').innerText += ` ${data.transcription}`;
+                        } else if (data.error) {
+                            console.error('Error in transcription:', data.error);
+                        }
+
+                        if (isTranscribing) {
+                            setTimeout(fetchTranscription, 1000); // Poll every second
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching live transcription:', error);
+                    });
+            }
+        }
+
+        // Fetch the question based on the current question number
+        function fetchQuestion(questionNumber = null) {
+            let url = questionNumber ? `/interview/get_question/?question_number=${questionNumber}` : `/interview/get_question/`; // Fetch first question if no number
+            console.log("Fetching question from:", url);
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('questionField').innerText = "No more questions available.";
+                        return;
+                    }
+
+                    document.getElementById('questionField').innerText = data.question_text;
+                    currentQuestionNumber = data.question_number; // Update current question number
+                    console.log("Current Question Number:", currentQuestionNumber);
+                })
+                .catch(error => {
+                    console.error('Error fetching question:', error);
+                    document.getElementById('question').innerText = "Error fetching question.";
+                });
+        }
+
+        // Move to the next question
+        function nextQuestion() {
+            if (currentQuestionNumber === null) {
+                console.error("No current question to move forward from.");
+                return;
+            }
+
+            fetch(`/interview/stop_transcription/?question_number=${currentQuestionNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.next_question_number) {
+                        fetchQuestion(data.next_question_number); // Fetch next question dynamically
+                        console.log(data.next_question_number);
+                    } else {
+                        document.getElementById('questionField').innerText = "Okay, the questions are finished. You can exit the interview.";
+                        console.log("exiting");
+
+                        fetch(`/interview/no_questions_left/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log("Total score updated:", data);
+                                endCall(); // Call endCall() after successful request
+                            })
+                            .catch(error => console.error('Error calling no_questions_left:', error));
+                    }
+
+                    // document.getElementById('result').innerText = ""; // Clear previous result
+                })
+                .catch(error => {
+                    console.error('Error fetching next question:', error);
+                });
+        }
+
+        // Fetch the first question when the page loads
+        window.onload = function () {
+            fetchQuestion(); // Start by fetching the first question
+        };
+    </script>
+</body>
+
+</html>

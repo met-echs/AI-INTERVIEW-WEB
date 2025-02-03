@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You - INPACT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+    
+        body {
+            font-size: 16px;
+            background-color: #ffffff;
+            line-height: 1.6;
+        }
+    
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 1.5rem 5%;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2A6DB0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .logo:hover {
+            color: #1A4B7E;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            stroke: #2A6DB0;
+            transition: stroke 0.3s ease;
+        }
+
+        .logo:hover .logo-icon {
+            stroke: #1A4B7E;
+        }
+
+        .interview-container {
+            padding: 2.5rem;
+            max-width: 800px;
+            margin: 5rem auto;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+    
+        h1 {
+            color: #2C3E50;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+    
+        p {
+            color: #4A5568;
+            margin-bottom: 1rem;
+        }
+    
+        ul {
+            text-align: left;
+            list-style: none;
+            margin: 2rem 0;
+        }
+    
+        ul li {
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem 0;
+            background: #F7FAFC;
+            border-left: 4px solid #2A6DB0;
+            border-radius: 4px;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+    
+        ul li:hover {
+            transform: translateX(8px);
+        }
+
+        .checkmark-icon {
+            width: 64px;
+            height: 64px;
+            margin: 2rem 0;
+            stroke: #2A6DB0;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .home-button {
+            background: linear-gradient(135deg, #2A6DB0 0%, #1A4B7E 100%);
+            color: white;
+            padding: 1rem 2.5rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(42, 109, 176, 0.2);
+        }
+
+        .home-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(42, 109, 176, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .interview-container {
+                padding: 1.5rem;
+                margin: 3rem 1rem;
+            }
+            
+            nav {
+                padding: 1rem 5%;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            ul li {
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="Home.html" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            INPACT
+        </a>
+        <span class="company-name">TechCorp AI Interviews</span>
+    </nav>
+
+    <div class="interview-container">
+        <svg class="checkmark-icon" viewBox="0 0 24 24">
+            <path d="M20 6L9 17l-5-5"/>
+        </svg>
+        <h1>Thank You for Your Participation!</h1>
+        <p>Dear <strong>{{ name }},</strong></p>
+        <p>Your interview has been successfully submitted. Here's what happens next:</p>
+        
+        <ul>
+            <li>Your interview recording will be reviewed by our team</li>
+            <li>Final results will be sent to your registered email within 3-5 business days</li>
+            <li>You'll receive detailed feedback along with the results</li>
+            <li>Check your spam folder if you don't see our email</li>
+        </ul>
+
+        <p>We appreciate you taking the time to interview with us using INPACT.</p>
+        
+        <button class="home-button" onclick="returnToHome()">
+            Return to Home
+        </button>
+    </div>
+
+    <script>
+        function returnToHome() {
+            window.location.href = "{% url 'home' %}";
+        }
+    </script>
+</body>
+</html>
