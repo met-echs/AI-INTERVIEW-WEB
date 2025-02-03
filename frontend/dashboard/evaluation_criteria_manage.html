@@ -285,15 +285,6 @@
                     <h1>Evaluation Criteria Management</h1>
                 </header>
 
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
                 <!-- Add Criteria Section -->
                 <div class="form-section {% if evaluation_criteria %}d-none{% endif %}">
                     <h3 class="card-title mb-4">Create New Evaluation Criteria</h3>
