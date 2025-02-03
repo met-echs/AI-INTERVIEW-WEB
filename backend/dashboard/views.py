@@ -98,7 +98,7 @@ def login_page(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             try:
-                admin = Admin.objects.get(email=username, password=password)
+                admin = Admin.objects.get(username=username, password=password)
                 # Store user ID in session
                 messages.success(request, "Login successful!")
                 return render(request, 'dashboard/rank.html')
