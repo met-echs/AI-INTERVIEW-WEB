@@ -7,37 +7,19 @@ from .models import Question
 from .forms import QuestionCriteriaForm
 from ApplyPage.models import Candidate
 def manage_evaluation_criteria(request):
-    # If the request is POST, handle form submission or delete action
-    if request.method == 'POST':
-        if 'add_criteria' in request.POST:
-            # If the "Add Criteria" form is submitted, save the new entry
-            form = EvaluationCriteriaForm(request.POST)
-            if form.is_valid():
-                form.save()
-                # Add success message
-                messages.success(request, 'New evaluation criteria added successfully!')
-                return redirect('manage_evaluation_criteria')  # Redirect after saving
-            else:
-                # If the form is not valid, add an error message
-                messages.error(request, 'Failed to add new evaluation criteria. Please check the form.')
-        elif 'delete_all' in request.POST:
-            # If the "Delete All" button is pressed, delete all records
-            EvaluationCriteria.objects.all().delete()
-            # Add success message
-            messages.success(request, 'All evaluation criteria deleted successfully!')
-            return redirect('manage_evaluation_criteria')  # Redirect after deletion
-    else:
-        # If the request is GET, just fetch the data and show the form
-        form = EvaluationCriteriaForm()
-    
-    # Fetch all existing evaluation criteria
-    evaluation_criteria = EvaluationCriteria.objects.all()
+    form = None  # Define form at the start to avoid UnboundLocalError
 
-    # Return both the form and the evaluation criteria to the template
-    return render(request, 'dashboard/evaluation_criteria_manage.html', {
-        'form': form,
-        'evaluation_criteria': evaluation_criteria
-    })
+    if request.method == "POST":
+        form = EvaluationCriteriaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("evaluation_criteria_list")
+    
+    else:
+        form = EvaluationCriteriaForm()
+
+    return render(request, "dashboard/evaluation_criteria_manage.html", {"form": form})
+
 def question_manage_criteria(request):
     if request.method == 'POST':
         if 'add_criteria' in request.POST:
@@ -101,7 +83,7 @@ def login_page(request):
                 admin = Admin.objects.get(username=username, password=password)
                 # Store user ID in session
                 messages.success(request, "Login successful!")
-                return render(request, 'dashboard/rank.html')
+                return redirect( 'high_scores')
             except Candidate.DoesNotExist:
                 messages.error(request, "Invalid username or password.")
         else:
@@ -110,11 +92,3 @@ def login_page(request):
     else:
         form = LoginForm()
     return render(request, 'dashboard/Login.html', {'form': form})
-
-def candidate_detail(request, candidate_id):
-    candidate = get_object_or_404(Candidate, pk=candidate_id)
-    interviews = Interview.objects.filter(candidate=candidate).prefetch_related('responses__question')
-    return render(request, 'dashboard/candidate_detail.html', {
-        'candidate': candidate,
-        'interviews': interviews
-    })

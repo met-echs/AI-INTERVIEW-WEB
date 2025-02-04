@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechCorp AI - Leaderboard</title>
+    <title>TechCorp AI - Candidate Details</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkE2REIwIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTUtMTAtNXpNMjAgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01Ii8+PC9zdmc+">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <style>
@@ -14,8 +14,8 @@
         }
 
         body {
-            background-color: #f8f9fa;
             font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #f8f9fa;
             min-height: 100vh;
         }
 
@@ -58,6 +58,7 @@
         .logo:hover .logo-icon {
             stroke: #1A4B7E;
         }
+
         .company-name {
             font-size: 16px;
             color: #2c3e50;
@@ -135,61 +136,53 @@
             transition: margin 0.3s ease;
         }
 
-        /* Leaderboard Content Styles */
-        .container {
-            max-width: 1200px;
-            padding: 40px 20px;
-        }
-
-        .page-header {
-            border-bottom: 3px solid var(--primary-color);
-            padding-bottom: 1rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .page-header h1 {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .candidate-card {
+        /* Candidate Details Specific Styles */
+        .detail-card {
             background: white;
             border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transition: transform 0.2s ease;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .candidate-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        .video-download-btn {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.3s ease;
         }
 
-        .score-pill {
+        .video-download-btn:hover {
+            background: #465d7a;
+            color: white;
+        }
+
+        .response-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+        }
+
+        .response-table th {
             background: var(--primary-color);
             color: white;
-            padding: 0.5rem 1.25rem;
-            border-radius: 20px;
-            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
         }
 
-        .empty-state {
-            background: white;
-            border-radius: 10px;
-            padding: 3rem;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        .response-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--accent-color);
         }
 
-        .btn-primary {
-            background: var(--primary-color);
-            border: none;
-            padding: 0.75rem 1.5rem;
-        }
-
-        .btn-primary:hover {
-            background: var(--secondary-color);
+        .response-table tr:hover {
+            background-color: rgba(42, 109, 176, 0.1);
         }
 
         @media (max-width: 768px) {
@@ -220,52 +213,79 @@
     <div class="dashboard-container">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-links">
-                <a href="{% url 'high_scores' %}" class="sidebar-link active" onclick="showPage('candidates')">Candidates</a>
-                <a href="{% url 'manage_evaluation_criteria' %}" class="sidebar-link" onclick="showPage('evaluation')">Evaluation</a>
-                <a href="{% url 'question_manage_criteria' %}" class="sidebar-link" onclick="showPage('questions')">Questions</a>
+                <a href="{% url 'high_scores' %}" class="sidebar-link active">Candidates</a>
+                <a href="{% url 'manage_evaluation_criteria' %}" class="sidebar-link">Evaluation</a>
+                <a href="{% url 'question_manage_criteria' %}" class="sidebar-link ">Questions</a>
             </div>
         </aside>
 
         <main class="main-content">
             <div class="container">
-                <header class="page-header">
-                    <h1>Candidate Leaderboard</h1>
+                <header class="mb-4">
+                    <h1>{{ candidate.name }} - Detailed Analysis</h1>
                 </header>
 
-                <div class="leaderboard-container">
-                    {% for candidate in candidates %}
-                    <div class="candidate-card">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h3 class="mb-2">{{ candidate.name }}</h3>
-                                <div class="d-flex gap-4">
-                                    <div>
-                                        <span class="text-muted">Resume Score:</span>
-                                        <span class="score-pill">{{ candidate.resume_score|default:"N/A" }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="text-muted">Overall Score:</span>
-                                        <span class="score-pill">{{ candidate.overall_score|default:"N/A" }}</span>
-                                    </div>
+                <div class="detail-card">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Candidate Profile</h5>
+                            <p><strong>Email:</strong> {{ candidate.email }}</p>
+                            <p><strong>Resume:</strong> <a href="{{ candidate.resume_link }}" class="resume-link" target="_blank">View Resume</a></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Interview Recordings</h5>
+                            {% for interview in interviews %}
+                                {% if interview.video_call_path %}
+                                <div class="mt-2">
+                                    <a href="{{ interview.video_call_path }}" class="video-download-btn" download>
+                                        Interview {{ forloop.counter }}
+                                    </a>
                                 </div>
-                            </div>
-                            <a href="{% url 'candidate_detail' candidate.candidate_id %}" 
-                               class="btn btn-primary">
-                                View Details →
-                            </a>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
-                    {% empty %}
-                    <div class="empty-state">
-                        <h3>No Candidates Found</h3>
-                        <p class="text-muted">No candidates have completed interviews yet.</p>
-                    </div>
-                    {% endfor %}
                 </div>
-                
-                <div class="candidates-grid" id="candidatesList">
-                    <!-- Candidate cards will be dynamically inserted here -->
-                <!-- </div>
+
+                {% for interview in interviews %}
+                <div class="detail-card">
+                    <h4>{{ interview.job_role }} Interview</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Total Score:</strong> {{ interview.total_score }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Date:</strong> {{ interview.interview_date|date:"M d, Y" }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Time:</strong> {{ interview.interview_date|time:"H:i" }}</p>
+                        </div>
+                    </div>
+                    <h5>Question Breakdown</h5>
+                    <table class="response-table">
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Response</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for response in interview.responses.all %}
+                            <tr>
+                                <td>{{ response.question.question_text }}</td>
+                                <td>{{ response.response_text|truncatechars:80 }}</td>
+                                <td>{{ response.score }}/100</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-3">No responses recorded</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
             </div>
         </main>
     </div>
