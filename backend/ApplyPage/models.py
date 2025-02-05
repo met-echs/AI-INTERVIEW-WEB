@@ -6,7 +6,7 @@ class Candidate(models.Model):
     name = models.CharField(max_length=100, verbose_name="Full Name")
     email = models.EmailField(unique=True, verbose_name="Email Address")
     password = models.CharField(max_length=255, verbose_name="Password")
-    resume = models.FileField(upload_to='resumes/')
+    resume_path = models.FileField(upload_to='resumes/',null=True, blank=True)
     resume_score = models.IntegerField(
         null=True, blank=True, 
         verbose_name="Resume Score", 

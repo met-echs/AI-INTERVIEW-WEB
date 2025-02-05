@@ -226,6 +226,9 @@
 
             <button type="submit" class="login-btn">Login</button>
         </form>
+        {% for message in messages %}
+    <p class="message {% if message.level == 'success' %}success{% endif %} {% if message.level == 'error' %}error{% endif %}">{{ message }}</p>
+{% endfor %}
         <a href="{% url 'admin_login' %}" class="admin-login">Admin login</a>
     </div>
 

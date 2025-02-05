@@ -89,7 +89,7 @@ def login_view(request):
                 # Store user ID in session
                 request.session['candidate_name'] = user.name
                 request.session['candidate_id'] = user.pk
-                messages.success(request, "Login successful!")
+                # messages.success(request, "Login successful!")
                 return render(request, 'interview/interview_home.html', {'name': user.name})
             except Candidate.DoesNotExist:
                 messages.error(request, "Invalid username or password.")
