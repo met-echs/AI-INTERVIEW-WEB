@@ -11,6 +11,4 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('',views.home, name='home'),
     path('contact/', views.contact_form, name='contact'),
-]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

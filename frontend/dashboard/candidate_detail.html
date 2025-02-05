@@ -230,7 +230,7 @@
                         <div class="col-md-6">
                             <h5>Candidate Profile</h5>
                             <p><strong>Email:</strong> {{ candidate.email }}</p>
-                            <p><strong>Resume:</strong> <a href="{{ candidate.resume_link }}" class="resume-link" target="_blank">View Resume</a></p>
+                            <p><strong>Resume:</strong> <a href="{{ candidate.resume_path.url }}" class="resume-link" target="_blank">View Resume</a></p>
                         </div>
                         <div class="col-md-6">
                             <h5>Interview Recordings</h5>

@@ -112,7 +112,7 @@ def login_page(request):
     else:
         form = LoginForm()
     return render(request, 'dashboard/Login.html', {'form': form})
-
+from Interview.models import Interview
 def candidate_detail(request, candidate_id):
     candidate = get_object_or_404(Candidate, pk=candidate_id)
     interviews = Interview.objects.filter(candidate=candidate)
