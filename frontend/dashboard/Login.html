@@ -28,10 +28,29 @@
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2A6DB0;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .logo:hover {
+            color: #1A4B7E;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            stroke: #2A6DB0;
+            transition: stroke 0.3s ease;
+        }
+
+        .logo:hover .logo-icon {
+            stroke: #1A4B7E;
         }
 
         .nav-links {
@@ -128,18 +147,7 @@
             background-color: #2980b9;
         }
 
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2c3e50;
-            text-decoration: none;
-        }
-
-        .logo:hover {
-            color: #2c3e50;
-        }
-
-        .user-login {
+        .admin-login {
             display: block;
             text-align: center;
             margin-top: 1.5rem;
@@ -189,6 +197,8 @@
             INPACT
         </a>
         <div class="nav-links">
+            <a href="{% url 'apply' %}">Apply</a>
+            <a href="{% url 'login' %}">Login</a>
             <a href="{% url 'contact' %}">Contact</a>
         </div>
     </nav>
@@ -216,8 +226,10 @@
 
             <button type="submit" class="login-btn">Login</button>
         </form>
-
-        <a href="{% url 'login' %}" class="user-login">User login</a>
+        {% for message in messages %}
+    <p class="message {% if message.level == 'success' %}success{% endif %} {% if message.level == 'error' %}error{% endif %}">{{ message }}</p>
+{% endfor %}
+        <a href="{% url 'login' %}" class="admin-login">User login</a>
     </div>
 
     <script>

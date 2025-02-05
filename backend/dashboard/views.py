@@ -71,7 +71,7 @@ def high_scores(request):
     return render(request, 'dashboard/rank.html', {'candidates': candidates})
 
 from .forms import LoginForm
-
+from django.contrib.auth import authenticate, login
 from .models import Admin
 def login_page(request):
     if request.method == 'POST':
@@ -84,11 +84,11 @@ def login_page(request):
                 # Store user ID in session
                 messages.success(request, "Login successful!")
                 return redirect( 'high_scores')
-            except Candidate.DoesNotExist:
+            except Admin.DoesNotExist:
                 messages.error(request, "Invalid username or password.")
         else:
             messages.error(request, "Invalid form data.")
-        return redirect('login')  # Redirect to avoid resubmission
+        return redirect('admin_login')  # Redirect to avoid resubmission
     else:
         form = LoginForm()
     return render(request, 'dashboard/Login.html', {'form': form})
