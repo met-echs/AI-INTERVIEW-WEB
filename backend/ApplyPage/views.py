@@ -96,7 +96,7 @@ Return only the final score as a **number** between -1 and 100, without any expl
                             email=email,
                             password=password,
                             resume_score=score,
-                            resume_link=file_path,
+                            resume_path=file_path,
                             created_at=datetime.now()
                         )
                     except Exception as e:
