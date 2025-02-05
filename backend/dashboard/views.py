@@ -7,18 +7,38 @@ from .models import Question
 from .forms import QuestionCriteriaForm
 from ApplyPage.models import Candidate
 def manage_evaluation_criteria(request):
-    form = None  # Define form at the start to avoid UnboundLocalError
-
-    if request.method == "POST":
-        form = EvaluationCriteriaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("evaluation_criteria_list")
+    criteria_list = EvaluationCriteria.objects.all()
+    form = EvaluationCriteriaForm()
     
-    else:
-        form = EvaluationCriteriaForm()
+    if request.method == 'POST':
+        # Handle criteria creation
+        if 'add_criteria' in request.POST:
+            if criteria_list.exists():
+                messages.warning(request, "You can only create one set of evaluation criteria.")
+                return redirect('manage_evaluation_criteria')
+                
+            form = EvaluationCriteriaForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Evaluation criteria created successfully!")
+                return redirect('manage_evaluation_criteria')
+        
+        # Handle criteria update
+        elif 'update_criteria' in request.POST:
+            criteria_id = request.POST.get('criteria_id')
+            criteria = get_object_or_404(EvaluationCriteria, id=criteria_id)
+            form = EvaluationCriteriaForm(request.POST, instance=criteria)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Evaluation criteria updated successfully!")
+                return redirect('manage_evaluation_criteria')
+    
+    context = {
+        'evaluation_criteria': criteria_list,
+        'form': form,
+    }
+    return render(request, 'dashboard/evaluation_criteria_manage.html', context)
 
-    return render(request, "dashboard/evaluation_criteria_manage.html", {"form": form})
 
 def question_manage_criteria(request):
     if request.method == 'POST':
