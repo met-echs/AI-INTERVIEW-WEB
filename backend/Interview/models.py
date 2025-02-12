@@ -4,7 +4,7 @@ class Interview(models.Model):
     candidate = models.ForeignKey("ApplyPage.Candidate", on_delete=models.CASCADE, related_name="interviews")
     job_role = models.CharField(max_length=255)
     total_score = models.IntegerField(default=0, verbose_name="Total Interview Score")
-    video_call_path = models.URLField(verbose_name="Video Call Recording Path", null=True, blank=True)
+    video_path = models.FileField(upload_to='interview_recordings/',null=True)
     interview_date = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechCorp AI - Candidate Details</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkE2REIwIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTUtMTAtNXpNMjAgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01Ii8+PC9zdmc+">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkE2REIwIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTUtMTAtNXpNMjAgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01Ii8+PC9zdmc+">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <style>
         :root {
@@ -26,7 +28,7 @@
             align-items: center;
             padding: 25px 50px;
             background: #ffffff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             position: fixed;
             width: 100%;
             top: 0;
@@ -74,7 +76,7 @@
         .sidebar {
             width: 250px;
             background: #ffffff;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             padding: 20px;
             position: fixed;
             height: calc(100vh - 80px);
@@ -142,7 +144,7 @@
             border-radius: 10px;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .video-download-btn {
@@ -190,18 +192,19 @@
                 margin-left: 0;
                 padding: 20px;
             }
-            
+
             .sidebar {
                 z-index: 1001;
             }
         }
     </style>
 </head>
+
 <body>
     <nav>
         <a href="#" class="logo">
             <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
             INPACT
         </a>
@@ -230,61 +233,50 @@
                         <div class="col-md-6">
                             <h5>Candidate Profile</h5>
                             <p><strong>Email:</strong> {{ candidate.email }}</p>
-                            <p><strong>Resume:</strong> <a href="{{ candidate.resume_path.url }}" class="resume-link" target="_blank">View Resume</a></p>
+                            <p><strong>Resume:</strong> <a href="{{ candidate.resume_path.url }}" class="resume-link"
+                                    target="_blank">View Resume</a></p>
                         </div>
                         <div class="col-md-6">
                             <h5>Interview Recordings</h5>
                             {% for interview in interviews %}
-                                {% if interview.video_call_path %}
-                                <div class="mt-2">
-                                    <a href="{{ interview.video_call_path }}" class="video-download-btn" download>
-                                        Interview {{ forloop.counter }}
-                                    </a>
-                                </div>
-                                {% endif %}
+                            {% if interview.video_path %}
+                            <div class="mt-2">
+                                <a href="{{ interview.video_path.url }}" class="video-download-btn" download>
+                                    Download Recording
+                                </a>
+                            </div>
+                            {% endif %}
                             {% endfor %}
                         </div>
                     </div>
                 </div>
 
                 {% for interview in interviews %}
-                <div class="detail-card">
-                    <h4>{{ interview.job_role }} Interview</h4>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <p><strong>Total Score:</strong> {{ interview.total_score }}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <p><strong>Date:</strong> {{ interview.interview_date|date:"M d, Y" }}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <p><strong>Time:</strong> {{ interview.interview_date|time:"H:i" }}</p>
-                        </div>
-                    </div>
-                    <h5>Question Breakdown</h5>
-                    <table class="response-table">
-                        <thead>
-                            <tr>
-                                <th>Question</th>
-                                <th>Response</th>
-                                <th>Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for response in interview.responses.all %}
-                            <tr>
-                                <td>{{ response.question.question_text }}</td>
-                                <td>{{ response.response_text|truncatechars:80 }}</td>
-                                <td>{{ response.score }}/100</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="3" class="text-center text-muted py-3">No responses recorded</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                <h3>Interview ID: {{ interview.id }}</h3>
+                <table class="response-table">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Response</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for response in interview.responses.all %}
+                        <tr>
+                            <td>{{ response.question.question }}</td>
+                            <td>{{ response.response_text|truncatechars:80 }}</td>
+                            <td>{{ response.score }}/100</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">No responses recorded</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% empty %}
+                <p class="text-center text-muted">No interviews found.</p>
                 {% endfor %}
             </div>
         </main>
@@ -297,10 +289,10 @@
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('sidebarToggle');
             const mainContent = document.querySelector('.main-content');
-            
+
             sidebar.classList.toggle('collapsed');
             toggleBtn.classList.toggle('collapsed');
-            
+
             mainContent.style.marginLeft = sidebar.classList.contains('collapsed') ? '0' : '250px';
         }
 
@@ -318,4 +310,5 @@
         });
     </script>
 </body>
+
 </html>
