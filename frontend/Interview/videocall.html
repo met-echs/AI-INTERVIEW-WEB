@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkE2REIwIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTUtMTAtNXpNMjAgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01Ii8+PC9zdmc+">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkE2REIwIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTUtMTAtNXpNMjAgMTdsMTAgNSAxMC01TTIgMTJsMTAgNSAxMC01Ii8+PC9zdmc+">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Recorder</title>
@@ -314,20 +315,20 @@
             }
         }
         // Function to get query parameters
-function getQueryParam(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
-}
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
 
-// Retrieve the interview ID
-const interviewId = getQueryParam("interview_id");
+        // Retrieve the interview ID
+        const interviewId = getQueryParam("interview_id");
 
-if (interviewId) {
-    console.log("Interview ID:", interviewId);
-    // You can now use interviewId to fetch data or display it on the page
-} else {
-    alert("Interview ID not found!");
-}
+        if (interviewId) {
+            console.log("Interview ID:", interviewId);
+            // You can now use interviewId to fetch data or display it on the page
+        } else {
+            alert("Interview ID not found!");
+        }
 
         function setupMediaRecorderHandlers() {
             mediaRecorder.ondataavailable = event => {
@@ -335,31 +336,31 @@ if (interviewId) {
             };
 
             mediaRecorder.onstop = () => {
-    const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
-    const formData = new FormData();
-    
-    formData.append('video', blob, `recording-${Date.now()}.mp4`);
-    formData.append('interview_id',interviewId );  // Ensure CANDIDATE_ID is defined
+                const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
+                const formData = new FormData();
 
-    fetch('/interview/upload-recording/', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            console.log('Video uploaded successfully:', data.path);
-            window.location.href = "{% url 'thankyouinterview' %}";
-        } else {
-            console.error('Upload failed:', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Upload error:', error);
-    });
-    
-    recordedChunks = [];  // Clear recorded chunks
-};
+                formData.append('video', blob, `recording-${Date.now()}.mp4`);
+                formData.append('interview_id', interviewId);  // Ensure CANDIDATE_ID is defined
+
+                fetch('/interview/upload-recording/', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            console.log('Video uploaded successfully:', data.path);
+                            window.location.href = "{% url 'thankyouinterview' %}";
+                        } else {
+                            console.error('Upload failed:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Upload error:', error);
+                    });
+
+                recordedChunks = [];  // Clear recorded chunks
+            };
 
         }
 
@@ -522,18 +523,14 @@ if (interviewId) {
             fetch(`/interview/stop_transcription/?question_number=${currentQuestionNumber}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.response && data.score !== undefined) {
-                        console.log("h")
-                        // document.getElementById('result').innerText = `Response: ${data.response}\nScore: ${data.score}`;
-                    } else {
-                        console.log("H")
-                        // document.getElementById('result').innerText = "Error with transcription data.";
-                    }
-                    nextQuestion();  // Automatically move to the next question
+                    // Optionally handle the response (e.g., show the response or score)
+                    console.log("Evaluation response received:", data);
+
+                    // Directly pass the received data to nextQuestion
+                    nextQuestion(data);
                 })
                 .catch(error => {
                     console.error('Error stopping transcription:', error);
-                    // document.getElementById('result').innerText = "Error stopping transcription.";
                 });
         }
 
@@ -583,41 +580,27 @@ if (interviewId) {
         }
 
         // Move to the next question
-        function nextQuestion() {
-            if (currentQuestionNumber === null) {
-                console.error("No current question to move forward from.");
-                return;
-            }
+        function nextQuestion(data) {
+            if (data.next_question_number) {
+                fetchQuestion(data.next_question_number); // Fetch the next question dynamically
+                console.log("Next Question Number:", data.next_question_number);
+            } else {
+                document.getElementById('questionField').innerText = "Okay, the questions are finished. You can exit the interview.";
+                console.log("Exiting interview");
 
-            fetch(`/interview/stop_transcription/?question_number=${currentQuestionNumber}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.next_question_number) {
-                        fetchQuestion(data.next_question_number); // Fetch next question dynamically
-                        console.log(data.next_question_number);
-                    } else {
-                        document.getElementById('questionField').innerText = "Okay, the questions are finished. You can exit the interview.";
-                        console.log("exiting");
-
-                        fetch(`/interview/no_questions_left/`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log("Total score updated:", data);
-                                endCall(); // Call endCall() after successful request
-                            })
-                            .catch(error => console.error('Error calling no_questions_left:', error));
+                fetch(`/interview/no_questions_left/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
-
-                    // document.getElementById('result').innerText = ""; // Clear previous result
                 })
-                .catch(error => {
-                    console.error('Error fetching next question:', error);
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Total score updated:", data);
+                        endCall(); // Call endCall() after successful request
+                    })
+                    .catch(error => console.error('Error calling no_questions_left:', error));
+            }
         }
 
         // Fetch the first question when the page loads
