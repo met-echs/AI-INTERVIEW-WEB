@@ -235,10 +235,10 @@
                         <div class="col-md-6">
                             <h5>Interview Recordings</h5>
                             {% for interview in interviews %}
-                                {% if interview.video_call_path %}
+                                {% if interview.video_path %}
                                 <div class="mt-2">
-                                    <a href="{{ interview.video_call_path }}" class="video-download-btn" download>
-                                        Interview {{ forloop.counter }}
+                                    <a href="{{ interview.video_path.url }}" class="video-download-btn" download>
+                                        Download Recording
                                     </a>
                                 </div>
                                 {% endif %}
