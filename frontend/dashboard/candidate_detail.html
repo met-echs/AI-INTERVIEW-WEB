@@ -252,6 +252,19 @@
                 </div>
 
                 {% for interview in interviews %}
+                <div class="detail-card">
+                    <h4>{{ interview.job_role }} Interview</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Total Score:</strong> {{ interview.total_score }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Date:</strong> {{ interview.interview_date|date:"M d, Y" }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Time:</strong> {{ interview.interview_date|time:"H:i" }}</p>
+                        </div>
+                    </div>
                 <h3>Interview ID: {{ interview.id }}</h3>
                 <table class="response-table">
                     <thead>
