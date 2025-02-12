@@ -338,7 +338,7 @@ if (interviewId) {
     const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
     const formData = new FormData();
     
-    formData.append('video', blob, `recording-${Date.now()}.webm`);
+    formData.append('video', blob, `recording-${Date.now()}.mp4`);
     formData.append('interview_id',interviewId );  // Ensure CANDIDATE_ID is defined
 
     fetch('/interview/upload-recording/', {
