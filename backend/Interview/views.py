@@ -22,6 +22,46 @@ response_text_accumulator = ""
 current_question_id = 0
 global_user = None
 
+def upload_recording(request):
+    print("i am waked")
+
+    if request.method == 'POST' and request.FILES.get('video'):
+        print("video is comming")
+
+        try:
+            video_file = request.FILES['video']  # Get the uploaded file
+            interview_id = request.POST.get('interview_id')  # Get interview_id from request
+
+            if not interview_id:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Interview ID is required'
+                }, status=400)
+
+            # Fetch the existing interview entry
+            interview = get_object_or_404(Interview, interview_id=interview_id)
+
+            # Update the video_path field
+            interview.video_path = video_file
+            interview.save()
+
+            return JsonResponse({
+                'status': 'success',
+                'path': interview.video_path.url  # Return the URL of the uploaded file
+            })
+
+        except Exception as e:
+            print(f"Error: {e}")
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)  # Return the error message
+            }, status=500)
+
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Invalid request method or missing video file'
+    }, status=400)
+
 def index(request):
     # Get the interview_id from the GET parameters
     interview_id = request.GET.get("interview_id")

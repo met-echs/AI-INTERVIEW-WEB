@@ -313,6 +313,21 @@
                 alert('Camera and microphone access required!');
             }
         }
+        // Function to get query parameters
+function getQueryParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+// Retrieve the interview ID
+const interviewId = getQueryParam("interview_id");
+
+if (interviewId) {
+    console.log("Interview ID:", interviewId);
+    // You can now use interviewId to fetch data or display it on the page
+} else {
+    alert("Interview ID not found!");
+}
 
         function setupMediaRecorderHandlers() {
             mediaRecorder.ondataavailable = event => {
@@ -320,21 +335,32 @@
             };
 
             mediaRecorder.onstop = () => {
-                const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `recording-${Date.now()}.webm`;
-                document.body.appendChild(a);
-                a.click();
+    const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
+    const formData = new FormData();
+    
+    formData.append('video', blob, `recording-${Date.now()}.webm`);
+    formData.append('interview_id',interviewId );  // Ensure CANDIDATE_ID is defined
 
-                setTimeout(() => {
-                    URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                    recordedChunks = [];
-                    window.location.href = "{% url 'thankyouinterview' %}";
-                }, 100);
-            };
+    fetch('/interview/upload-recording/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            console.log('Video uploaded successfully:', data.path);
+            window.location.href = "{% url 'thankyouinterview' %}";
+        } else {
+            console.error('Upload failed:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Upload error:', error);
+    });
+    
+    recordedChunks = [];  // Clear recorded chunks
+};
+
         }
 
         async function flipCamera() {
